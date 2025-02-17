@@ -7,7 +7,11 @@ const cors = require('cors')
 
 const app = express()
 
-app.use(cors)
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
 app.use(express.json())
 
@@ -18,4 +22,4 @@ sequelize.sync({ force: false })
   .then(() => console.log('Database connected'))
   .catch(err => console.error('Database error:', err))
 
-app.listen(1762, () => console.log('Server running on port 1762 anjay'))
+app.listen(7718, () => console.log('Server running on port 7718 anjay'))
