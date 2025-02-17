@@ -3,8 +3,12 @@ const express = require('express')
 const sequelize = require('./config/database')
 const recordRoutes = require('./routes/RecordRoutes')
 const vehicleRoutes = require('./routes/VehicleRoutes')
+const cors = require('cors')
 
 const app = express()
+
+app.use(cors)
+
 app.use(express.json())
 
 app.use('/api', recordRoutes)
