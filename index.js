@@ -5,7 +5,7 @@ const recordRoutes = require('./routes/RecordRoutes')
 const vehicleRoutes = require('./routes/VehicleRoutes')
 const cors = require('cors')
 
-const app = express()
+
 
 const allowedOrigins = ['https://apigps.findingoillosses.com']
 
@@ -20,6 +20,8 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }))
+
+const app = express()
 
 app.use(express.json())
 
