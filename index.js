@@ -7,11 +7,19 @@ const cors = require('cors')
 
 const app = express()
 
+const allowedOrigins = ['https://apigps.findingoillosses.com']
+
 app.use(cors({
-  origin: '*',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+}))
 
 app.use(express.json())
 
