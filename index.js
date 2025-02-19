@@ -5,11 +5,9 @@ const recordRoutes = require('./routes/RecordRoutes')
 const vehicleRoutes = require('./routes/VehicleRoutes')
 const cors = require('cors')
 
-
+const app = express()
 
 app.use(cors())
-
-const app = express()
 
 app.use(express.json())
 
