@@ -1,9 +1,10 @@
 const express = require('express')
-const { getAllRecords,getLatestRecords,storeRecord,getHistory } = require('../controllers/RecordController')
+const { getLatestRecords, storeRecord, getHistory, getLatestRecordsById } = require('../controllers/RecordController')
 
 const router = express.Router()
 
 router.post('/latestRecords', getLatestRecords)
+router.post('/getLatestRecordsById', getLatestRecordsById)
 router.post('/storeRecord', storeRecord)
 router.post('/history', getHistory)
 

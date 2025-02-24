@@ -89,7 +89,22 @@ const checkAreaInternal = async (lat, long) => {
 exports.getLatestRecords = async (req, res) => {
     try {
         const records = await LastRecord.findAll()
-        console.log(records)
+        res.json(records)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: error.message })
+    }
+}
+
+exports.getLatestRecordsById = async (req, res) => {
+    try {
+        const { ids } = req.body
+
+        const records = await LastRecord.findAll({
+            where: {
+                idDevice: {in: ids}
+            }
+        })
         res.json(records)
     } catch (error) {
         console.log(error)
