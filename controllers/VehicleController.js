@@ -12,6 +12,22 @@ exports.getVehicle = async (req, res) => {
     }
 }
 
+exports.getVehicleByCat = async (req, res) => {
+    try {
+        const { cat } = req.body
+
+        const vehicle = await Vehicle.findAll({
+            where: {
+                cat: cat
+            }
+        })
+
+        res.json(vehicle)
+    } catch (error) {
+        res.status(500).send({ message: error.message })
+    }
+}
+
 exports.storeVehicle = async (req, res) => {
     try {
         const { nopol, kode, cat } = req.body
