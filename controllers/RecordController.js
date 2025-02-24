@@ -102,7 +102,7 @@ exports.getLatestRecordsById = async (req, res) => {
 
         const records = await LastRecord.findAll({
             where: {
-                idDevice: {in: ids}
+                idDevice: ids
             }
         })
         res.json(records)
