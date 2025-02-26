@@ -5,6 +5,7 @@ const recordRoutes = require('./routes/RecordRoutes')
 const vehicleRoutes = require('./routes/VehicleRoutes')
 const driverRoutes = require('./routes/DriverRoutes')
 const cors = require('cors')
+const defineAssociations = require('./models/Associations')
 
 const app = express()
 
@@ -15,6 +16,8 @@ app.use(express.json())
 app.use('/api', recordRoutes)
 app.use('/api', vehicleRoutes)
 app.use('/api', driverRoutes)
+
+defineAssociations()
 
 sequelize.sync({ force: false })
   .then(() => console.log('Database connected'))

@@ -37,7 +37,11 @@ const Record = sequelize.define('record', {
   },
   timestamp: {
     type: DataTypes.DATE,
-    allowNull: false
+    allowNull: false,
+    get() {
+      const value = this.getDataValue('timestamp')        
+      return value ? moment(value).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss') : null
+    }
   }
 }, {
   timestamps: false,

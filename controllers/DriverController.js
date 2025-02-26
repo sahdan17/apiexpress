@@ -60,31 +60,55 @@ exports.driveSession = async (req, res) => {
 
         const { rfid, vehicle_id } = req.body
 
-        const driver = await Driver.findOne({
-            where:{
-                rfid: rfid
-            }
-        })
+        let driveNew = {}
 
-        let driveNew = {};
-
-        let driveSess = await DriveSession.findOne({
-            where:{
-                [Op.and]: {
-                    vehicle_id: vehicle_id,
-                    driver_id: driver.id
+        const driveSess = await DriveSession.findOne({
+            where: {
+                vehicle_id: vehicle_id
+            },
+            include: [
+                {
+                    model: Driver,
+                    as: 'driver'
                 }
-            }
+            ],
+            order: [
+                ['id', 'DESC']
+            ]
         })
 
-        if (!driveSess || driveSess.stop == null) {
+        if (driveSess && driveSess.driver.rfid == rfid) {
+            if (driveSess.stop == undefined) {
+                console.log(driveSess.stop)
+                console.log('masuk1')
+                
+                driveNew = await DriveSession.update({
+                    stop: timestamp
+                },
+                {
+                    where: {
+                        id: driveSess.id
+                    }
+                })
+            } else {
+                console.log('masuk2')
+                
+                driveNew = await DriveSession.create({
+                    vehicle_id: vehicle_id,
+                    driver_id: driveSess.driver.id,
+                    start: timestamp
+                })
+            }
+        } else if (driveSess && driveSess.driver.rfid != rfid) {
+            console.log('masuk3')
+            
             driveNew = await DriveSession.create({
                 vehicle_id: vehicle_id,
-                driver_id: driver.id,
+                driver_id: driveSess.driver.id,
                 start: timestamp
             })
-        } else {
-            driveNew = await DriveSession.update({
+
+            await DriveSession.update({
                 stop: timestamp
             },
             {
@@ -93,6 +117,23 @@ exports.driveSession = async (req, res) => {
                 }
             })
         }
+
+        // if (!driveSess || driveSess.stop == null) {
+        //     driveNew = await DriveSession.create({
+        //         vehicle_id: vehicle_id,
+        //         driver_id: driver.id,
+        //         start: timestamp
+        //     })
+        // } else {
+        //     driveNew = await DriveSession.update({
+        //         stop: timestamp
+        //     },
+        //     {
+        //         where: {
+        //             id: driveSess.id
+        //         }
+        //     })
+        // }
 
         res.json({
             message: "Data berhasil tersimpan",

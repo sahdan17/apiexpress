@@ -1,7 +1,8 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('../config/database')
+const moment = require('moment')
 
-const VehicleDriver = sequelize.define('drive_session', {
+const DriveSession = sequelize.define('drive_session', {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -18,15 +19,23 @@ const VehicleDriver = sequelize.define('drive_session', {
     },
     start: {
         type: DataTypes.DATE,
-        allowNull: true
+        allowNull: true,
+        get() {
+            const value = this.getDataValue('start')
+            return value ? moment(value).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss') : null
+        }
     },
     stop: {
         type: DataTypes.DATE,
-        allowNull: true
+        allowNull: true,
+        get() {
+            const value = this.getDataValue('stop')
+            return value ? moment(value).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss') : null
+        }
     }
 }, {
-  timestamps: false,
-  tableName: 'drive_session'
+    timestamps: false,
+    tableName: 'drive_session'
 })
 
-module.exports = VehicleDriver
+module.exports = DriveSession

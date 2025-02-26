@@ -35,11 +35,15 @@ const LastRecord = sequelize.define('lastrecord', {
   },
   timestamp: {
     type: DataTypes.DATE,
-    allowNull: false
+    allowNull: false,
+    get() {
+        const value = this.getDataValue('timestamp')
+        return value ? moment(value).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss') : null
+    }
   }
 }, {
-  timestamps: false,
-  tableName: 'lastrecord'
+    timestamps: false,
+    tableName: 'lastrecord'
 })
 
 module.exports = LastRecord
