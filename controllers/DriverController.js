@@ -55,7 +55,7 @@ exports.createDriver = async (req, res) => {
 }
 
 exports.driveSession = async (req, res) => {
-    try {
+    // try {
         const timestamp = moment().tz("Asia/Jakarta").format("YYYY-MM-DD HH:mm:ss")
 
         const { rfid, vehicle_id } = req.body
@@ -95,7 +95,7 @@ exports.driveSession = async (req, res) => {
             message: "Data berhasil tersimpan",
             data: driveNew
         })
-    } catch (error) {
-        res.status(500).json({ message: error.message })
-    }
+    // } catch (error) {
+    //     res.status(500).json({ message: error.message })
+    // }
 }
