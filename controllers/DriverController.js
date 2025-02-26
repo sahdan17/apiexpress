@@ -85,9 +85,12 @@ exports.driveSession = async (req, res) => {
             })
         } else {
             driveNew = await DriveSession.update({
-                id: driveSess.id
-            },{
                 stop: timestamp
+            },
+            {
+                where: {
+                    id: driveSess.id
+                }
             })
         }
 
