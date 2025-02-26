@@ -8,7 +8,7 @@ const VehicleDriver = sequelize.define('drive_session', {
         primaryKey: true,
         allowNull: false
     },
-    kode_vehicle: {
+    vehicle_id: {
         type: DataTypes.STRING(15),
         allowNull: false
     },

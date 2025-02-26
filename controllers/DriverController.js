@@ -66,6 +66,8 @@ exports.driveSession = async (req, res) => {
             }
         })
 
+        const driveNew = {};
+
         const driveSess = await DriveSession.findOne({
             where:{
                 [Op.and]: {
@@ -76,20 +78,23 @@ exports.driveSession = async (req, res) => {
         })
 
         if (driveSess.length == 0) {
-            await DriveSession.create({
+            driveNew = await DriveSession.create({
                 vehicle_id: vehicle_id,
                 driver_id: driver.id,
                 start: timestamp
             })
         } else {
-            await DriveSession.update({
+            driveNew = await DriveSession.update({
                 id: driveSess.id
             },{
                 stop: timestamp
             })
         }
 
-        res.json({ message: "Data berhasil tersimpan" })
+        res.json({
+            message: "Data berhasil tersimpan",
+            data: driveNew
+        })
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
