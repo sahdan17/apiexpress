@@ -38,6 +38,8 @@ exports.createDriver = async (req, res) => {
                 driver_name: driver_name,
                 no_wa: no_wa
             })
+
+            await RFIDTemp.destroy({ where: {} })
         } else {
             res.status(500).json({ message: "Lakukan tapping terlebih dahulu" })
         }
