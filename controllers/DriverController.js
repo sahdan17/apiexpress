@@ -1,5 +1,6 @@
 const RFIDTemp = require('../models/RFIDTemp')
 const Driver = require('../models/Driver')
+const DriveSession = require('../models/DriveSession')
 const { Op } = require("sequelize")
 const moment = require('moment')
 
@@ -48,6 +49,47 @@ exports.createDriver = async (req, res) => {
             status: "success",
             message: "Data berhasil disimpan"
         })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
+exports.driveSession = async (req, res) => {
+    try {
+        const timestamp = moment().tz("Asia/Jakarta").format("YYYY-MM-DD HH:mm:ss")
+
+        const { rfid, vehicle_id } = req.body
+
+        const driver = await Driver.findOne({
+            where:{
+                rfid: rfid
+            }
+        })
+
+        const driveSess = await DriveSession.findOne({
+            where:{
+                [Op.and]: {
+                    vehicle_id: vehicle_id,
+                    driver_id: driver.id
+                }
+            }
+        })
+
+        if (driveSess.length == 0) {
+            await DriveSession.create({
+                vehicle_id: vehicle_id,
+                driver_id: driver.id,
+                start: timestamp
+            })
+        } else {
+            await DriveSession.update({
+                id: driveSess.id
+            },{
+                stop: timestamp
+            })
+        }
+
+        res.json({ message: "Data berhasil tersimpan" })
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
