@@ -21,8 +21,8 @@ const Vehicle = sequelize.define('vehicle', {
         allowNull: false
     }
 }, {
-  timestamps: false,
-  tableName: 'vehicle'
+    timestamps: false,
+    tableName: 'vehicle'
 })
 
 module.exports = Vehicle
