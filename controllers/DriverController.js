@@ -32,11 +32,9 @@ exports.createDriver = async (req, res) => {
 
         const rfidTemp = await RFIDTemp.findAll()
 
-        console.log(rfidTemp)        
-
         if (rfidTemp.length > 0) {
             await Driver.create({
-                rfid: rfidTemp,
+                rfid: rfidTemp[0].rfid,
                 driver_name: driver_name,
                 no_wa: no_wa
             })
