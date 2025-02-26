@@ -58,7 +58,7 @@ exports.driveSession = async (req, res) => {
     try {
         const timestamp = moment().tz("Asia/Jakarta").format("YYYY-MM-DD HH:mm:ss")
 
-        const { rfid, vehicle_id } = req.body
+        const { rfid, vehicle_id } = req.body        
 
         let driveNew = {}
 
@@ -101,10 +101,16 @@ exports.driveSession = async (req, res) => {
             }
         } else if (driveSess && driveSess.driver.rfid != rfid) {
             console.log('masuk3')
+
+            const driverRFID = await Driver.findOne({
+                where: {
+                    rfid: rfid
+                }
+            })
             
             driveNew = await DriveSession.create({
                 vehicle_id: vehicle_id,
-                driver_id: driveSess.driver.id,
+                driver_id: driverRFID.id,
                 start: timestamp
             })
 
