@@ -66,7 +66,7 @@ exports.driveSession = async (req, res) => {
             }
         })
 
-        const driveNew = {};
+        let driveNew = {};
 
         let driveSess = await DriveSession.findOne({
             where:{
