@@ -2,7 +2,7 @@ const RFIDTemp = require('../models/RFIDTemp')
 const { Op } = require("sequelize")
 const moment = require('moment')
 
-exports.storeRecord = async (req, res) => {
+exports.storeRFIDTemp = async (req, res) => {
     try {
         const { rfid } = req.body
 
