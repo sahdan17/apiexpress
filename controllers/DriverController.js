@@ -79,9 +79,6 @@ exports.driveSession = async (req, res) => {
 
         if (driveSess && driveSess.driver.rfid == rfid) {
             if (driveSess.stop == undefined) {
-                console.log(driveSess.stop)
-                console.log('masuk1')
-                
                 driveNew = await DriveSession.update({
                     stop: timestamp
                 },
@@ -91,8 +88,6 @@ exports.driveSession = async (req, res) => {
                     }
                 })
             } else {
-                console.log('masuk2')
-                
                 driveNew = await DriveSession.create({
                     vehicle_id: vehicle_id,
                     driver_id: driveSess.driver.id,
@@ -100,8 +95,6 @@ exports.driveSession = async (req, res) => {
                 })
             }
         } else if (driveSess && driveSess.driver.rfid != rfid) {
-            console.log('masuk3')
-
             const driverRFID = await Driver.findOne({
                 where: {
                     rfid: rfid
@@ -123,23 +116,6 @@ exports.driveSession = async (req, res) => {
                 }
             })
         }
-
-        // if (!driveSess || driveSess.stop == null) {
-        //     driveNew = await DriveSession.create({
-        //         vehicle_id: vehicle_id,
-        //         driver_id: driver.id,
-        //         start: timestamp
-        //     })
-        // } else {
-        //     driveNew = await DriveSession.update({
-        //         stop: timestamp
-        //     },
-        //     {
-        //         where: {
-        //             id: driveSess.id
-        //         }
-        //     })
-        // }
 
         res.json({
             message: "Data berhasil tersimpan",
