@@ -77,7 +77,7 @@ exports.driveSession = async (req, res) => {
             }
         })
 
-        if (!driveSess) {
+        if (!driveSess || driveSess.stop == null) {
             driveNew = await DriveSession.create({
                 vehicle_id: vehicle_id,
                 driver_id: driver.id,
