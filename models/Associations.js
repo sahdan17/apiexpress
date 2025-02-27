@@ -1,13 +1,9 @@
-import Driver, { hasMany } from './Driver'
-import DriveSession, { belongsTo } from './DriveSession'
-import Vehicle, { hasMany } from './Vehicle'
-import LastRecord, { belongsTo } from './LastRecord'
+const Driver = require('./Driver')
+const DriveSession = require('./DriveSession')
 
 const defineAssociations = () => {
-    hasMany(DriveSession, { foreignKey: 'driver_id', as: 'driveSessions' })
-    belongsTo(Driver, { foreignKey: 'driver_id', as: 'driver' })
-    hasMany(Vehicle, { foreignKey: 'idDevice', as: 'vehicles' })
-    belongsTo(LastRecord, { foreignKey: 'idDevice', as: 'lastRecord' })
+    Driver.hasMany(DriveSession, { foreignKey: 'driver_id', as: 'driveSessions' })
+    DriveSession.belongsTo(Driver, { foreignKey: 'driver_id', as: 'driver' })
 }
 
-export default defineAssociations
+module.exports = defineAssociations
