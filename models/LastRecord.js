@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('../config/database')
+const moment = require('moment')
 
 const LastRecord = sequelize.define('lastrecord', {
     lat: {

@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('../config/database')
+const moment = require('moment')
 
 const Record = sequelize.define('record', {
     id: {
