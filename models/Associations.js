@@ -1,7 +1,7 @@
 const Driver = require('./Driver')
 const DriveSession = require('./DriveSession')
 const LastRecord = require('./LastRecord')
-const Vehicle = require('./DriveSession')
+const Vehicle = require('./Vehicle')
 
 const defineAssociations = () => {
     Driver.hasMany(DriveSession, { foreignKey: 'driver_id', as: 'driveSessions' })
