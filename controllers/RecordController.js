@@ -110,6 +110,9 @@ exports.getLatestRecordsById = async (req, res) => {
                     model: Vehicle,
                     as: 'vehicle'
                 }
+            ],
+            order: [
+                ['id', 'DESC']
             ]
         })
 
