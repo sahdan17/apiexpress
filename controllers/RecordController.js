@@ -5,6 +5,8 @@ const { Op } = require("sequelize")
 const moment = require('moment')
 const fs = require("fs")
 const turf = require("@turf/turf")
+const DriveSession = require('../models/DriveSession')
+const Driver = require('../models/Driver')
 
 exports.storeRecord = async (req, res) => {
     try {
@@ -113,7 +115,26 @@ exports.getLatestRecordsById = async (req, res) => {
             ]
         })
 
-        res.json(records)
+        const driveSess = await DriveSession.findAll({
+            where: {
+                vehicle_id: ids
+            },
+            include: [
+                {
+                    model: Driver,
+                    as: 'driver'
+                }
+            ],
+            order: [[
+                'id', 'DESC'
+            ]],
+            limit: 1
+        })
+
+        res.json({
+            records: records,
+            driveSession: driveSess
+        })
     } catch (error) {
         console.log(error)
         res.status(500).json({ message: error.message })

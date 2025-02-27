@@ -8,6 +8,8 @@ const defineAssociations = () => {
     DriveSession.belongsTo(Driver, { foreignKey: 'driver_id', as: 'driver' })
     Vehicle.hasMany(LastRecord, { foreignKey: 'idDevice', as: 'lastRecords' })
     LastRecord.belongsTo(Vehicle, { foreignKey: 'idDevice', as: 'vehicle' })
+    // DriveSession.hasMany(LastRecord, { foreignKey: 'idDevice', as: 'lastRecords' })
+    // LastRecord.belongsTo(DriveSession, { foreignKey: 'idDevice', as: 'driveSession' })
 }
 
 module.exports = defineAssociations
