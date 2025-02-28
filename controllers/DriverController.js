@@ -117,7 +117,7 @@ exports.driveSession = async (req, res) => {
                     }
                 })
             } else {
-                res.status(500).json({ message: "Driver belum terdaftar" })
+                res.status(400).json({ message: "Driver belum terdaftar" })
             }
         }
 
