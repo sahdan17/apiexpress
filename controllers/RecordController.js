@@ -127,8 +127,7 @@ exports.getLatestRecordsById = async (req, res) => {
             ],
             order: [[
                 'id', 'DESC'
-            ]],
-            limit: 1
+            ]]
         })
 
         res.json({
