@@ -120,6 +120,12 @@ exports.driveSession = async (req, res) => {
                 res.status(400).json({ message: "Driver belum terdaftar" })
             }
         } else {
+            const driverRFID = await Driver.findOne({
+                where: {
+                    rfid: rfid
+                }
+            })
+            
             driveNew = await DriveSession.create({
                 vehicle_id: vehicle_id,
                 driver_id: driverRFID.id,
