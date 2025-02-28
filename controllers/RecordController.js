@@ -1,7 +1,7 @@
 const Record = require('../models/Record')
 const LastRecord = require('../models/LastRecord')
 const Vehicle = require('../models/Vehicle')
-const { Op } = require("sequelize")
+const { Op, Sequelize } = require("sequelize")
 const moment = require('moment')
 const fs = require("fs")
 const turf = require("@turf/turf")
