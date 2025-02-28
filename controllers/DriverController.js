@@ -119,6 +119,12 @@ exports.driveSession = async (req, res) => {
             } else {
                 res.status(400).json({ message: "Driver belum terdaftar" })
             }
+        } else {
+            driveNew = await DriveSession.create({
+                vehicle_id: vehicle_id,
+                driver_id: driverRFID.id,
+                start: timestamp
+            })
         }
 
         res.json({
