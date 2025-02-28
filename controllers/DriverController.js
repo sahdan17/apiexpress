@@ -101,20 +101,24 @@ exports.driveSession = async (req, res) => {
                 }
             })
             
-            driveNew = await DriveSession.create({
-                vehicle_id: vehicle_id,
-                driver_id: driverRFID.id,
-                start: timestamp
-            })
-
-            await DriveSession.update({
-                stop: timestamp
-            },
-            {
-                where: {
-                    id: driveSess.id
-                }
-            })
+            if (driverRFID) {
+                driveNew = await DriveSession.create({
+                    vehicle_id: vehicle_id,
+                    driver_id: driverRFID.id,
+                    start: timestamp
+                })
+    
+                await DriveSession.update({
+                    stop: timestamp
+                },
+                {
+                    where: {
+                        id: driveSess.id
+                    }
+                })
+            } else {
+                res.status(400).json({ message: "Driver belum terdaftar" })
+            }
         }
 
         res.json({
@@ -122,6 +126,8 @@ exports.driveSession = async (req, res) => {
             data: driveNew
         })
     } catch (error) {
+        console.log(error);
+        
         res.status(500).json({ message: error.message })
     }
 }
