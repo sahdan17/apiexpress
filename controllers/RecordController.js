@@ -117,9 +117,9 @@ exports.getLatestRecordsById = async (req, res) => {
 
         const driveSess = await DriveSession.findAll({
             where: {
-                vehicle_id: {
+                id: {
                     [Op.in]: Sequelize.literal(`(
-                        SELECT MAX(id) FROM "drive_session" WHERE vehicle_id IN (${ids.join(',')}) GROUP BY vehicle_id
+                        SELECT MAX(id) FROM drive_session WHERE vehicle_id IN (${ids.join(',')}) GROUP BY vehicle_id
                     )`)
                 }
             },
