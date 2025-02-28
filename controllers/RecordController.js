@@ -119,7 +119,7 @@ exports.getLatestRecordsById = async (req, res) => {
             where: {
                 vehicle_id: {
                     [Op.in]: Sequelize.literal(`(
-                        SELECT MAX(id) FROM "DriveSessions" WHERE vehicle_id IN (${ids.join(',')}) GROUP BY vehicle_id
+                        SELECT MAX(id) FROM "drive_session" WHERE vehicle_id IN (${ids.join(',')}) GROUP BY vehicle_id
                     )`)
                 }
             },
