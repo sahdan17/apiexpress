@@ -36,6 +36,10 @@ const Record = sequelize.define('record', {
         type: DataTypes.INTEGER,
         allowNull: false
     },
+    idSession: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+    },
     timestamp: {
         type: DataTypes.DATE,
         allowNull: false,

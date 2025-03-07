@@ -34,6 +34,10 @@ const LastRecord = sequelize.define('lastrecord', {
         autoIncrement: false,
         unique: true
     },
+    idSession: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+    },
     timestamp: {
         type: DataTypes.DATE,
         allowNull: false,

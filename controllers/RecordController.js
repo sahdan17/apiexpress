@@ -13,6 +13,22 @@ exports.storeRecord = async (req, res) => {
         const timestamp = moment().tz("Asia/Jakarta").format("YYYY-MM-DD HH:mm:ss")
         const { lat, long, speed, sat, dir, status, idDevice } = req.body
 
+        const driveSesion = await DriveSession.findOne({
+            where: {
+                vehicle_id: idDevice,
+                stop: null
+            },
+            order: [
+                ['id', 'DESC']
+            ]
+        })
+
+        let idDS = null
+
+        if (driveSesion) {
+            idDS = driveSesion.id
+        }
+
         await Record.create({
             lat: lat,
             long: long,
@@ -21,11 +37,13 @@ exports.storeRecord = async (req, res) => {
             dir: dir,
             status: status,
             idDevice: idDevice,
+            idSession: idDS,
             timestamp: timestamp
         })
 
         await LastRecord.upsert({
             idDevice: idDevice,
+            idSession: idDS,
             lat: lat,
             long: long,
             speed: speed,
@@ -109,34 +127,24 @@ exports.getLatestRecordsById = async (req, res) => {
             },
             include: [
                 {
+                    model: DriveSession,
+                    as: 'driveSessions',
+                    include: [
+                        {
+                            model: Driver,
+                            as: 'driver'
+                        }
+                    ]
+                },
+                {
                     model: Vehicle,
                     as: 'vehicle'
                 }
             ]
         })
 
-        const driveSess = await DriveSession.findAll({
-            where: {
-                id: {
-                    [Op.in]: Sequelize.literal(`(
-                        SELECT MAX(id) FROM drive_session WHERE vehicle_id IN (${ids.join(',')}) GROUP BY vehicle_id
-                    )`)
-                }
-            },
-            include: [
-                {
-                    model: Driver,
-                    as: 'driver'
-                }
-            ],
-            order: [[
-                'id', 'DESC'
-            ]]
-        })
-
         res.json({
             records: records,
-            driveSession: driveSess
         })
     } catch (error) {
         console.log(error)
@@ -150,6 +158,16 @@ exports.getHistory = async (req, res) => {
 
         const nextDay = moment(date, 'YYYY-MM-DD').add(1, 'days').format('YYYY-MM-DD')
 
+        // const records = await Record.findAll({
+        //     where: {
+        //         idDevice: idDevice,
+        //         timestamp: {
+        //             [Op.gte]: date,
+        //             [Op.lt]: nextDay
+        //         }
+        //     }
+        // })
+
         const records = await Record.findAll({
             where: {
                 idDevice: idDevice,
@@ -157,7 +175,23 @@ exports.getHistory = async (req, res) => {
                     [Op.gte]: date,
                     [Op.lt]: nextDay
                 }
-            }
+            },
+            include: [
+                {
+                    model: DriveSession,
+                    as: 'driveSessions',
+                    include: [
+                        {
+                            model: Driver,
+                            as: 'driver'
+                        }
+                    ]
+                },
+                {
+                    model: Vehicle,
+                    as: 'vehicle'
+                }
+            ]
         })
 
         res.json(records)
