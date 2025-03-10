@@ -7,6 +7,7 @@ const fs = require("fs")
 const turf = require("@turf/turf")
 const DriveSession = require('../models/DriveSession')
 const Driver = require('../models/Driver')
+const axios = require("axios")
 
 exports.storeRecord = async (req, res) => {
     try {
@@ -55,6 +56,29 @@ exports.storeRecord = async (req, res) => {
 
         const areaCheckResult = await checkAreaInternal(lat, long)
 
+        if (areaCheckResult.inArea == false) {
+            try {
+                const vehicle = await Vehicle.findOne({
+                    where: {
+                        id: idDevice
+                    }
+                })
+
+                await axios.post("https://folpertaminafieldjambi.com/api/sendToDB",
+                    {
+                        message: `${vehicle.nopol} | ${vehicle.kode} melintas di luar jalur`,
+                        target: "120363288603708376@g.us"
+                    }, {
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    }
+                )
+            } catch (err) {
+                res.status(500).json({ message: err.message })
+            }
+        }
+
         res.json({
             status: "success",
             message: "Data berhasil disimpan",
@@ -99,7 +123,7 @@ const checkAreaInternal = async (lat, long) => {
         return {
             point: { latitude: lat, longitude: long },
             distance: nearestDistance.toFixed(2),
-            isWithinTolerance: check,
+            inArea: check,
             message: message
         }
     } catch (error) {
@@ -157,16 +181,6 @@ exports.getHistory = async (req, res) => {
         const { date, idDevice } = req.body
 
         const nextDay = moment(date, 'YYYY-MM-DD').add(1, 'days').format('YYYY-MM-DD')
-
-        // const records = await Record.findAll({
-        //     where: {
-        //         idDevice: idDevice,
-        //         timestamp: {
-        //             [Op.gte]: date,
-        //             [Op.lt]: nextDay
-        //         }
-        //     }
-        // })
 
         const records = await Record.findAll({
             where: {
