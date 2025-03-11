@@ -89,9 +89,36 @@ exports.storeRecord = async (req, res) => {
     }
 }
 
+exports.checkArea = async (req, res) => {
+    try {
+        const { point } = req.body
+
+        if (!point) {
+            return res.status(400).json({ message: "Point is required in the format 'lat,lng'" })
+        }
+
+        const coords = point.split(",").map(Number)
+
+        if (coords.length !== 2 || isNaN(coords[0]) || isNaN(coords[1])) {
+            return res.status(400).json({ message: "Invalid point format. Use 'lat,lng'" })
+        }
+
+        const [lat, lng] = coords
+
+        const areaCheckResult = await checkAreaInternal(lat, lng)
+        console.log("Latitude:", lat)
+        console.log("Longitude:", lng)
+
+        res.json(areaCheckResult)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
 const checkAreaInternal = async (lat, long) => {
     try {
-        const data = fs.readFileSync("./kmz/pps-sgl.json", "utf8")
+        // const data = fs.readFileSync("./kmz/pps-sgl.json", "utf8")
+        const data = fs.readFileSync("./kmz/rute_vt.json", "utf8")
 
         const polylines = JSON.parse(data)
 
