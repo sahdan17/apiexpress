@@ -167,7 +167,7 @@ exports.getGeofence = async (req, res) => {
             return res.status(500).json({ message: "Invalid geofence data format" })
         }
 
-        res.json({ geofence: geofenceArray })
+        res.json(geofenceArray)
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
