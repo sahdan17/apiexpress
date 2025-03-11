@@ -162,7 +162,7 @@ exports.getGeofence = async (req, res) => {
     try {
         const data = fs.readFileSync("./kmz/rute_vt.json", "utf8")
 
-        res.json(data)
+        res.json({ geofence: data })
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
