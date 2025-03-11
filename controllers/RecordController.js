@@ -161,8 +161,13 @@ const checkAreaInternal = async (lat, long) => {
 exports.getGeofence = async (req, res) => {
     try {
         const data = fs.readFileSync("./kmz/rute_vt.json", "utf8")
+        const geofenceArray = JSON.parse(data)
 
-        res.json({ geofence: data })
+        if (!Array.isArray(geofenceArray)) {
+            return res.status(500).json({ message: "Invalid geofence data format" })
+        }
+
+        res.json({ geofence: geofenceArray })
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
