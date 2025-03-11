@@ -213,3 +213,22 @@ exports.getHistory = async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 }
+
+exports.formatKML = async (req, res) => {
+    try {
+        const { input } = req.body
+
+        if (!input) {
+            return res.status(400).json({ message: "Input is required" })
+        }
+
+        const coordinates = input.split(" ").map(coord => {
+            const [x, y] = coord.split(",").map(Number)
+            return [x, y]
+        });
+
+        res.json(coordinates)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
