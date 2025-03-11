@@ -158,6 +158,16 @@ const checkAreaInternal = async (lat, long) => {
     }
 }
 
+exports.getGeofence = async (req, res) => {
+    try {
+        const data = fs.readFileSync("./kmz/rute_vt.json", "utf8")
+
+        res.json(data)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
 exports.getLatestRecords = async (req, res) => {
     try {
         const records = await LastRecord.findAll()
