@@ -1,18 +1,17 @@
 const Record = require('../models/Record')
 const LastRecord = require('../models/LastRecord')
 const Vehicle = require('../models/Vehicle')
-const { Op, Sequelize } = require("sequelize")
+const Routes = require('../models/Routes')
+const { Op, Sequelize, QueryTypes } = require("sequelize")
 const moment = require('moment')
 const fs = require("fs")
 const turf = require("@turf/turf")
 const DriveSession = require('../models/DriveSession')
 const Driver = require('../models/Driver')
 const axios = require("axios")
-const multer = require("multer")
 const { DOMParser } = require("@xmldom/xmldom")
 const path = require("path")
-
-const upload = multer({ dest: "uploads/" })
+const sequelize = require('../config/database')
 
 exports.storeRecord = async (req, res) => {
     try {
@@ -288,34 +287,11 @@ exports.convertKML = async (req, res) => {
         const parser = new DOMParser()
         const xmlDoc = parser.parseFromString(kmlData, "text/xml")
 
-        const coordinatesElements = xmlDoc.getElementsByTagName("coordinates")
+        const placemarks = xmlDoc.getElementsByTagName("Placemark")
 
-        console.log("Total elemen <coordinates> ditemukan:", coordinatesElements.length)
-
-        if (coordinatesElements.length === 0) {
+        if (placemarks.length === 0) {
             fs.unlinkSync(inputFilePath)
-            return res.status(500).json({ message: "Tidak ada data koordinat dalam file KML" })
-        }
-
-        let newCoordinates = []
-
-        for (let i = 0; i < coordinatesElements.length; i++) {
-            const coordText = coordinatesElements[i].textContent.trim()
-            console.log(`Koordinat Path ${i + 1}:`, coordText)
-
-            if (!coordText) continue
-
-            const coords = coordText.split(/\s+/).map(coord => {
-                const [x, y] = coord.split(",").map(Number)
-                return [x, y]
-            });
-
-            newCoordinates.push(coords)
-        }
-
-        if (newCoordinates.length === 0) {
-            fs.unlinkSync(inputFilePath)
-            return res.status(500).json({ message: "Parsing gagal, koordinat tidak ditemukan" })
+            return res.status(500).json({ message: "Tidak ada data <Placemark> dalam file KML" })
         }
 
         const kmzFolderPath = path.join(__dirname, "../kmz")
@@ -335,21 +311,61 @@ exports.convertKML = async (req, res) => {
                     existingData = []
                 }
             } catch (error) {
-                console.log("⚠️ Error membaca JSON:", error.message)
                 existingData = []
             }
         }
 
-        existingData.push(...newCoordinates)
+        let newCoordinates = []
+        let routesToInsert = []
 
-        console.log("Setelah push:", JSON.stringify(existingData, null, 2))
+        for (let i = 0; i < placemarks.length; i++) {
+            const placemark = placemarks[i]
+
+            const nameElement = placemark.getElementsByTagName("name")[0]
+            const nameText = nameElement ? nameElement.textContent.trim() : `Path ${i + 1}`
+
+            const coordinatesElement = placemark.getElementsByTagName("coordinates")[0]
+            if (!coordinatesElement) continue
+
+            const coordText = coordinatesElement.textContent.trim()
+
+            if (!coordText) continue
+
+            const coords = coordText.split(/\s+/).map(coord => {
+                const [x, y] = coord.split(",").map(Number)
+                return [x, y]
+            })
+
+            const pathId = existingData.length + newCoordinates.length
+
+            newCoordinates.push(coords)
+
+            routesToInsert.push(`(${pathId}, '${nameText.replace(/'/g, "''")}')`)
+        }
+
+        if (newCoordinates.length === 0) {
+            fs.unlinkSync(inputFilePath)
+            return res.status(500).json({ message: "Parsing gagal, tidak ada koordinat dalam <Placemark>" })
+        }
+
+        existingData.push(...newCoordinates)
 
         fs.writeFileSync(outputFilePath, JSON.stringify(existingData, null, 2))
 
+        if (routesToInsert.length > 0) {
+            const query = `INSERT INTO routes (path_id, name) VALUES ${routesToInsert.join(", ")}`
+            await sequelize.query(query, { type: QueryTypes.INSERT })
+        }
+
         fs.unlinkSync(inputFilePath)
 
-        res.json({ message: "Konversi berhasil", filePath: outputFilePath, data: existingData })
+        res.json({
+            message: "Konversi berhasil",
+            filePath: outputFilePath,
+            data: existingData,
+            routes: routesToInsert
+        })
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
-};
+}
