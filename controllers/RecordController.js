@@ -8,6 +8,11 @@ const turf = require("@turf/turf")
 const DriveSession = require('../models/DriveSession')
 const Driver = require('../models/Driver')
 const axios = require("axios")
+const multer = require("multer")
+const { DOMParser } = require("@xmldom/xmldom")
+const path = require("path")
+
+const upload = multer({ dest: "uploads/" })
 
 exports.storeRecord = async (req, res) => {
     try {
@@ -106,8 +111,6 @@ exports.checkArea = async (req, res) => {
         const [lat, lng] = coords
 
         const areaCheckResult = await checkAreaInternal(lat, lng)
-        console.log("Latitude:", lat)
-        console.log("Longitude:", lng)
 
         res.json(areaCheckResult)
     } catch (error) {
@@ -178,7 +181,6 @@ exports.getLatestRecords = async (req, res) => {
         const records = await LastRecord.findAll()
         res.json(records)
     } catch (error) {
-        console.log(error)
         res.status(500).json({ message: error.message })
     }
 }
@@ -213,7 +215,6 @@ exports.getLatestRecordsById = async (req, res) => {
             records: records,
         })
     } catch (error) {
-        console.log(error)
         res.status(500).json({ message: error.message })
     }
 }
@@ -267,9 +268,81 @@ exports.formatKML = async (req, res) => {
         const coordinates = input.split(" ").map(coord => {
             const [x, y] = coord.split(",").map(Number)
             return [x, y]
-        });
+        })
 
         res.json(coordinates)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
+exports.convertKML = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: "File KML belum diunggah" })
+        }
+
+        const inputFilePath = req.file.path
+        const kmlData = fs.readFileSync(inputFilePath, "utf8")
+
+        const parser = new DOMParser()
+        const xmlDoc = parser.parseFromString(kmlData, "text/xml")
+
+        const coordinatesElements = xmlDoc.getElementsByTagName("coordinates")
+
+        if (coordinatesElements.length === 0) {
+            fs.unlinkSync(inputFilePath)
+            return res.status(500).json({ message: "Tidak ada data koordinat dalam file KML" })
+        }
+
+        let newCoordinates = []
+
+        coordinatesElements.forEach((element, index) => {
+            const coordText = element.textContent.trim()
+        
+            if (!coordText) return
+        
+            const coords = coordText.split(/\s+/).map(coord => {
+                const [x, y] = coord.split(",").map(Number)
+                return [x, y]
+            })
+        
+            newCoordinates.push(...coords)
+        })
+
+        if (newCoordinates.length === 0) {
+            fs.unlinkSync(inputFilePath)
+            return res.status(500).json({ message: "Parsing gagal, koordinat tidak ditemukan" })
+        }
+
+        const kmzFolderPath = path.join(__dirname, "../kmz")
+        const outputFilePath = path.join(kmzFolderPath, "rute_vt.json")
+
+        if (!fs.existsSync(kmzFolderPath)) {
+            fs.mkdirSync(kmzFolderPath, { recursive: true })
+        }
+
+        let existingData = []
+
+        if (fs.existsSync(outputFilePath)) {
+            const rawData = fs.readFileSync(outputFilePath, "utf8").trim()
+            try {
+                existingData = rawData ? JSON.parse(rawData) : []
+                if (!Array.isArray(existingData)) {
+                    existingData = []
+                }
+            } catch (error) {
+                existingData = []
+            }
+        }
+
+        existingData.push(newCoordinates)
+
+        fs.writeFileSync(outputFilePath, JSON.stringify(existingData, null, 2))
+
+        fs.unlinkSync(inputFilePath)
+
+        res.json({ message: "Konversi berhasil", filePath: outputFilePath, data: existingData })
     } catch (error) {
         res.status(500).json({ message: error.message })
     }

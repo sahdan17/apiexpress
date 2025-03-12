@@ -11,13 +11,16 @@
     "description": "",
     "dependencies": {
         "@turf/turf": "^7.2.0",
+        "@xmldom/xmldom": "^0.9.8",
         "axios": "^1.8.2",
         "cors": "^2.8.5",
         "dotenv": "^16.4.7",
         "express": "^4.21.2",
         "fs": "^0.0.1-security",
         "moment": "^2.30.1",
+        "multer": "^1.4.5-lts.1",
         "mysql2": "^3.12.0",
+        "path": "^0.12.7",
         "sequelize": "^6.37.5"
     },
     "devDependencies": {
