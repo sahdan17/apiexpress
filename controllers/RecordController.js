@@ -290,6 +290,8 @@ exports.convertKML = async (req, res) => {
 
         const coordinatesElements = xmlDoc.getElementsByTagName("coordinates")
 
+        console.log("Total elemen <coordinates> ditemukan:", coordinatesElements.length)
+
         if (coordinatesElements.length === 0) {
             fs.unlinkSync(inputFilePath)
             return res.status(500).json({ message: "Tidak ada data koordinat dalam file KML" })
@@ -299,15 +301,16 @@ exports.convertKML = async (req, res) => {
 
         for (let i = 0; i < coordinatesElements.length; i++) {
             const coordText = coordinatesElements[i].textContent.trim()
+            console.log(`Koordinat Path ${i + 1}:`, coordText)
 
             if (!coordText) continue
 
             const coords = coordText.split(/\s+/).map(coord => {
                 const [x, y] = coord.split(",").map(Number)
                 return [x, y]
-            })
+            });
 
-            newCoordinates.push(...coords)
+            newCoordinates.push(coords)
         }
 
         if (newCoordinates.length === 0) {
@@ -332,11 +335,14 @@ exports.convertKML = async (req, res) => {
                     existingData = []
                 }
             } catch (error) {
+                console.log("⚠️ Error membaca JSON:", error.message)
                 existingData = []
             }
         }
 
-        existingData.push(newCoordinates)
+        existingData.push(...newCoordinates)
+
+        console.log("Setelah push:", JSON.stringify(existingData, null, 2))
 
         fs.writeFileSync(outputFilePath, JSON.stringify(existingData, null, 2))
 
@@ -346,4 +352,4 @@ exports.convertKML = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
-}
+};
