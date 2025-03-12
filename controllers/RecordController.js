@@ -297,18 +297,18 @@ exports.convertKML = async (req, res) => {
 
         let newCoordinates = []
 
-        coordinatesElements.forEach((element, index) => {
-            const coordText = element.textContent.trim()
-        
-            if (!coordText) return
-        
+        for (let i = 0; i < coordinatesElements.length; i++) {
+            const coordText = coordinatesElements[i].textContent.trim()
+
+            if (!coordText) continue
+
             const coords = coordText.split(/\s+/).map(coord => {
                 const [x, y] = coord.split(",").map(Number)
                 return [x, y]
             })
-        
+
             newCoordinates.push(...coords)
-        })
+        }
 
         if (newCoordinates.length === 0) {
             fs.unlinkSync(inputFilePath)
