@@ -369,3 +369,44 @@ exports.convertKML = async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 }
+
+exports.getRoutes = async (req, res) => {
+    try {
+        const routes = await Routes.findAll()
+
+        res.json({ routes: routes })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
+exports.deleteRoute = async (req, res) => {
+    try {
+        const { id } = req.body
+
+        const pathId = parseInt(id)
+
+        const kmzFolderPath = path.join(__dirname, "../kmz")
+        const outputFilePath = path.join(kmzFolderPath, "rute_vt.json")
+
+        let existingData = JSON.parse(fs.readFileSync(outputFilePath, "utf8"))
+
+        if (pathId < 0 || pathId >= existingData.length) {
+            return res.status(404).json({ message: "ID tidak ditemukan dalam rute_vt.json" })
+        }
+
+        existingData.splice(pathId, 1)
+
+        fs.writeFileSync(outputFilePath, JSON.stringify(existingData, null, 2))
+
+        await Routes.destroy({
+            where: {
+                path_id: pathId
+            }
+        })
+
+        res.json({ message: "Hapus path berhasil" })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}

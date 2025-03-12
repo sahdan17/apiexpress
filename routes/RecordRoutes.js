@@ -7,7 +7,9 @@ const {
     formatKML, 
     checkArea, 
     getGeofence, 
-    convertKML 
+    convertKML,
+    getRoutes,
+    deleteRoute
 } = require('../controllers/RecordController')
 
 const router = express.Router()
@@ -21,6 +23,8 @@ router.post('/history', getHistory)
 router.post('/formatKML', formatKML)
 router.post('/checkArea', checkArea)
 router.post('/getGeofence', getGeofence)
+router.post('/getRoutes', getRoutes)
+router.post('/deleteRoute', deleteRoute)
 router.post('/convertKML', upload.single("file"), convertKML)
 
 module.exports = router
