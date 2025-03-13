@@ -23,4 +23,4 @@ sequelize.sync({ force: false })
     .then(() => console.log('Database connected'))
     .catch(err => console.error('Database error:', err))
 
-app.listen(7718, () => console.log('Server running on port 7718 anjay mabar keren'))
+app.listen(7718, () => console.log('Server running on port 7718 anjay mabar'))
