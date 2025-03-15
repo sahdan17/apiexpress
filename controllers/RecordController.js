@@ -111,6 +111,29 @@ exports.checkArea = async (req, res) => {
 
         const areaCheckResult = await checkAreaInternal(lat, lng)
 
+        if (areaCheckResult.inArea == false) {
+            try {
+                const vehicle = await Vehicle.findOne({
+                    where: {
+                        id: 1
+                    }
+                })
+
+                await axios.post("https://folpertaminafieldjambi.com/api/sendToDB",
+                    {
+                        message: `${vehicle.nopol} | ${vehicle.kode} melintas di luar jalur`,
+                        target: "120363288603708376@g.us"
+                    }, {
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    }
+                )
+            } catch (err) {
+                res.status(500).json({ message: err.message })
+            }
+        }
+
         res.json(areaCheckResult)
     } catch (error) {
         res.status(500).json({ message: error.message })
