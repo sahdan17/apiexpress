@@ -119,7 +119,7 @@ exports.checkArea = async (req, res) => {
                     }
                 })
 
-                await axios.post("https://folpertaminafieldjambi.com/api/sendToDB",
+                await axios.post("https://foljambiold.findingoillosses.com/api/sendToDB",
                     {
                         message: `${vehicle.nopol} | ${vehicle.kode} melintas di luar jalur`,
                         target: "120363288603708376@g.us"
