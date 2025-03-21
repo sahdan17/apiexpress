@@ -68,16 +68,16 @@ exports.storeRecord = async (req, res) => {
                     }
                 })
 
-                // await axios.post("https://foljambiold.findingoillosses.com/api/sendToDB",
-                //     {
-                //         message: `${vehicle.nopol} | ${vehicle.kode} melintas di luar jalur`,
-                //         target: "120363288603708376@g.us"
-                //     }, {
-                //         headers: {
-                //             "Content-Type": "application/json"
-                //         }
-                //     }
-                // )
+                await axios.post("https://foljambiold.findingoillosses.com/api/sendToDB",
+                    {
+                        message: `${vehicle.nopol} | ${vehicle.kode} melintas di luar jalur`,
+                        target: "120363288603708376@g.us"
+                    }, {
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    }
+                )
             } catch (err) {
                 res.status(500).json({ message: err.message })
             }
