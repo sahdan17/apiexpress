@@ -68,7 +68,8 @@ exports.storeRecord = async (req, res) => {
                     }
                 })
 
-                await axios.post("https://foljambiold.findingoillosses.com/api/sendToDB",
+                // await axios.post("https://foljambiold.findingoillosses.com/api/sendToDB",
+                await axios.post("http://213.210.21.34:7718/api/sendToDB",
                     {
                         message: `${vehicle.nopol} | ${vehicle.kode} melintas di luar jalur`,
                         target: "120363288603708376@g.us"
