@@ -427,7 +427,6 @@ exports.getRoutes = async (req, res) => {
 exports.deleteRoute = async (req, res) => {
     try {
         const { id } = req.body
-
         const pathId = parseInt(id)
 
         const kmzFolderPath = path.join(__dirname, "../kmz")
@@ -435,11 +434,15 @@ exports.deleteRoute = async (req, res) => {
 
         let existingData = JSON.parse(fs.readFileSync(outputFilePath, "utf8"))
 
-        if (pathId < 0 || pathId >= existingData.length) {
+        if (isNaN(pathId) || pathId < 0 || pathId >= existingData.length) {
             return res.status(404).json({ message: "ID tidak ditemukan dalam rute_vt.json" })
         }
 
         existingData.splice(pathId, 1)
+
+        for (let i = 0; i < existingData.length; i++) {
+            existingData[i].path_id = i
+        }
 
         fs.writeFileSync(outputFilePath, JSON.stringify(existingData, null, 2))
 
@@ -449,7 +452,16 @@ exports.deleteRoute = async (req, res) => {
             }
         })
 
-        res.json({ message: "Hapus path berhasil" })
+        await Routes.increment('path_id', {
+            by: -1,
+            where: {
+                path_id: {
+                    [Op.gt]: pathId
+                }
+            }
+        })
+
+        res.json({ message: "Hapus path berhasil dan path_id disusun ulang" })
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
