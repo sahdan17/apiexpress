@@ -205,7 +205,6 @@ exports.getGeofence = async (req, res) => {
 exports.getGeofenceById = async (req, res) => {
     try {
         const { id } = req.body
-        const pathId = parseInt(id)
         
         const data = fs.readFileSync("./kmz/rute_vt.json", "utf8")
         const geofenceArray = JSON.parse(data)
@@ -434,43 +433,69 @@ exports.getRoutes = async (req, res) => {
 
 exports.deleteRoute = async (req, res) => {
     try {
-        const { id } = req.body
-        const pathId = parseInt(id)
+        let { id } = req.body
+
+        // Pastikan id dalam bentuk array of integer
+        if (!Array.isArray(id)) {
+            id = [parseInt(id)]
+        } else {
+            id = id.map(Number)
+        }
 
         const kmzFolderPath = path.join(__dirname, "../kmz")
         const outputFilePath = path.join(kmzFolderPath, "rute_vt.json")
 
         let existingData = JSON.parse(fs.readFileSync(outputFilePath, "utf8"))
 
-        if (isNaN(pathId) || pathId < 0 || pathId >= existingData.length) {
-            return res.status(404).json({ message: "ID tidak ditemukan dalam rute_vt.json" })
+        // Validasi id yang valid
+        const validIds = id.filter(idx => !isNaN(idx) && idx >= 0 && idx < existingData.length)
+        if (validIds.length === 0) {
+            return res.status(404).json({ message: "Tidak ada ID yang valid untuk dihapus" })
         }
 
-        existingData.splice(pathId, 1)
+        // Sort descending agar tidak mengacaukan index saat splice
+        validIds.sort((a, b) => b - a)
 
+        // Hapus dari array JSON
+        validIds.forEach(idx => {
+            existingData.splice(idx, 1)
+        })
+
+        // Reassign path_id ulang
         for (let i = 0; i < existingData.length; i++) {
             existingData[i].path_id = i
         }
 
         fs.writeFileSync(outputFilePath, JSON.stringify(existingData, null, 2))
 
+        // Hapus dari database
         await Routes.destroy({
             where: {
-                path_id: pathId
-            }
-        })
-
-        await Routes.increment('path_id', {
-            by: -1,
-            where: {
                 path_id: {
-                    [Op.gt]: pathId
+                    [Op.in]: validIds
                 }
             }
         })
 
-        res.json({ message: "Hapus path berhasil dan path_id disusun ulang" })
+        // Dapatkan minimum ID yang dihapus untuk menentukan yang perlu diupdate
+        const minDeleted = Math.min(...validIds)
+
+        // Kurangi path_id di DB untuk semua path_id > minDeleted
+        await Routes.increment('path_id', {
+            by: -validIds.length,
+            where: {
+                path_id: {
+                    [Op.gt]: minDeleted
+                }
+            }
+        })
+
+        res.json({
+            message: `Berhasil menghapus ${validIds.length} path dan menyusun ulang path_id`,
+            deleted_ids: validIds
+        })
     } catch (error) {
+        console.error("Error saat menghapus route:", error)
         res.status(500).json({ message: error.message })
     }
 }
