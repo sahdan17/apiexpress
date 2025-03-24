@@ -214,7 +214,14 @@ exports.getGeofenceById = async (req, res) => {
             return res.status(500).json({ message: "Invalid geofence data format" })
         }
 
-        res.json([geofenceArray[pathId]])
+        const ids = Array.isArray(id) ? id : [id]
+        const parsedIds = ids.map(i => parseInt(i)).filter(i => !isNaN(i))
+
+        const selectedGeofences = parsedIds
+            .map(index => geofenceArray[index])
+            .filter(item => item !== undefined)
+
+        res.json(selectedGeofences)
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
