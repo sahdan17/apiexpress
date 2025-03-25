@@ -5,7 +5,7 @@ const authenticateToken = require('../middlewares/AuthMiddleware')
 const router = express.Router()
 
 router.post('/getVehicle', authenticateToken, getVehicle)
-router.post('/storeVehicle', storeVehicle)
-router.post('/getVehicleByCat', getVehicleByCat)
+router.post('/storeVehicle', authenticateToken, storeVehicle)
+router.post('/getVehicleByCat', authenticateToken, getVehicleByCat)
 
 module.exports = router

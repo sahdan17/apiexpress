@@ -13,20 +13,22 @@ const {
     getGeofenceById
 } = require('../controllers/RecordController')
 
+const authenticateToken = require('../middlewares/AuthMiddleware')
+
 const router = express.Router()
 const multer = require("multer")
 const upload = multer({ dest: "uploads/" })
 
-router.post('/latestRecords', getLatestRecords)
-router.post('/getLatestRecordsById', getLatestRecordsById)
+router.post('/latestRecords', authenticateToken, getLatestRecords)
+router.post('/getLatestRecordsById', authenticateToken, getLatestRecordsById)
 router.post('/storeRecord', storeRecord)
-router.post('/history', getHistory)
-router.post('/formatKML', formatKML)
-router.post('/checkArea', checkArea)
-router.post('/getGeofence', getGeofence)
-router.post('/getGeofenceById', getGeofenceById)
-router.post('/getRoutes', getRoutes)
-router.post('/deleteRoute', deleteRoute)
-router.post('/convertKML', upload.single("file"), convertKML)
+router.post('/history', authenticateToken, getHistory)
+// router.post('/formatKML', formatKML)
+// router.post('/checkArea', checkArea)
+router.post('/getGeofence', authenticateToken, getGeofence)
+router.post('/getGeofenceById', authenticateToken, getGeofenceById)
+router.post('/getRoutes', authenticateToken, getRoutes)
+router.post('/deleteRoute', authenticateToken, deleteRoute)
+router.post('/convertKML', authenticateToken, upload.single("file"), convertKML)
 
 module.exports = router
