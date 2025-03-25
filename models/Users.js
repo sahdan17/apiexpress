@@ -37,22 +37,6 @@ const Users = sequelize.define('users', {
         type: DataTypes.INTEGER(1),
         allowNull: false
     },
-    created_at: {
-        type: DataTypes.DATE,
-        allowNull: true,
-        get() {
-            const value = this.getDataValue('timestamp')        
-            return value ? moment(value).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss') : null
-        }
-    },
-    updated_at: {
-        type: DataTypes.DATE,
-        allowNull: true,
-        get() {
-            const value = this.getDataValue('timestamp')        
-            return value ? moment(value).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss') : null
-        }
-    }
 }, {
     tableName: 'users'
 })
