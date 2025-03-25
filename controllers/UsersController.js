@@ -3,6 +3,7 @@ const { Op } = require("sequelize")
 const moment = require('moment')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+require('dotenv').config()
 const JWT_SECRET = process.env.JWT_SECRET
 
 function validatePassword(password) {
