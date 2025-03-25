@@ -4,6 +4,7 @@ const sequelize = require('./config/database')
 const recordRoutes = require('./routes/RecordRoutes')
 const vehicleRoutes = require('./routes/VehicleRoutes')
 const driverRoutes = require('./routes/DriverRoutes')
+const usersRoutes = require('./routes/UsersRoutes')
 const cors = require('cors')
 const defineAssociations = require('./models/Associations')
 
@@ -16,6 +17,7 @@ app.use(express.json())
 app.use('/api', recordRoutes)
 app.use('/api', vehicleRoutes)
 app.use('/api', driverRoutes)
+app.use('/api', usersRoutes)
 
 defineAssociations()
 
