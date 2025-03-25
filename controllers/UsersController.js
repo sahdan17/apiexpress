@@ -2,6 +2,9 @@ const Users = require('../models/Users')
 const { Op } = require("sequelize")
 const moment = require('moment')
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+
+const JWT_SECRET = 'sahdandwipriaalfian'
 
 function validatePassword(password) {
     const minLength = 8
@@ -55,5 +58,39 @@ exports.register = async (req, res) => {
         })
     } catch (error) {
         res.status(500).send({ message: error.message })
+    }
+}
+
+exports.login = async (req, res) => {
+    const { email, password } = req.body
+
+    try {
+        const user = await Users.findOne({
+            where: {
+                email: email
+            }
+        })
+
+        if (!user) {
+            return res.status(401).json({ message: 'Email tidak ditemukan' })
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password)
+
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: 'Password salah' })
+        }
+
+        const token = jwt.sign(
+            { id: user.id, email: user.email },
+            JWT_SECRET,
+            { expiresIn: '6h' }
+        )
+
+        res.json({ 
+            message: 'Login berhasil', 
+            token: token })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
     }
 }
