@@ -3,6 +3,24 @@ const { Op } = require("sequelize")
 const moment = require('moment')
 const bcrypt = require('bcryptjs')
 
+function validatePassword(password) {
+    const minLength = 8
+    const hasUpperCase = /[A-Z]/.test(password)
+    const hasNumber = /\d/.test(password)
+
+    if (password.length < minLength) {
+        return 'Password minimal 8 karakter'
+    }
+    if (!hasUpperCase) {
+        return 'Password harus mengandung huruf kapital'
+    }
+    if (!hasNumber) {
+        return 'Password harus mengandung angka'
+    }
+
+    return null
+}
+
 exports.register = async (req, res) => {
     const { name, email, password, role } = req.body
 
@@ -15,6 +33,11 @@ exports.register = async (req, res) => {
 
         if (existingUser) {
             return res.status(400).json({ message: "Email sudah terdaftar" })
+        }
+
+        const passwordError = validatePassword(password)
+        if (passwordError) {
+            return res.status(400).json({ message: passwordError })
         }
 
         const hashedPassword = await bcrypt.hash(password, 10)
