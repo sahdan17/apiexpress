@@ -25,7 +25,7 @@ function validatePassword(password) {
 }
 
 exports.register = async (req, res) => {
-    const { name, email, password, role } = req.body
+    const { name, email, password } = req.body
 
     try {
         const existingUser = await Users.findOne({
@@ -49,7 +49,7 @@ exports.register = async (req, res) => {
             name: name,
             email: email,
             password: hashedPassword,
-            role: role
+            role: 1
         })
 
         res.json({
