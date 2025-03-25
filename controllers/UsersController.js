@@ -3,8 +3,7 @@ const { Op } = require("sequelize")
 const moment = require('moment')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-
-const JWT_SECRET = 'sahdandwipriaalfian'
+const JWT_SECRET = process.env.JWT_SECRET
 
 function validatePassword(password) {
     const minLength = 8
