@@ -435,7 +435,6 @@ exports.deleteRoute = async (req, res) => {
     try {
         let { id } = req.body
 
-        // Pastikan id dalam bentuk array of integer
         if (!Array.isArray(id)) {
             id = [parseInt(id)]
         } else {
@@ -453,7 +452,6 @@ exports.deleteRoute = async (req, res) => {
             return res.status(404).json({ message: "Tidak ada ID yang valid untuk dihapus" })
         }
 
-        // Sort descending agar tidak mengacaukan index saat splice
         validIds.sort((a, b) => b - a)
 
         // Hapus dari array JSON
@@ -468,7 +466,6 @@ exports.deleteRoute = async (req, res) => {
 
         fs.writeFileSync(outputFilePath, JSON.stringify(existingData, null, 2))
 
-        // Hapus dari database
         await Routes.destroy({
             where: {
                 path_id: {
@@ -477,10 +474,8 @@ exports.deleteRoute = async (req, res) => {
             }
         })
 
-        // Dapatkan minimum ID yang dihapus untuk menentukan yang perlu diupdate
         const minDeleted = Math.min(...validIds)
 
-        // Kurangi path_id di DB untuk semua path_id > minDeleted
         await Routes.increment('path_id', {
             by: -validIds.length,
             where: {
