@@ -80,6 +80,10 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: 'Password salah' })
         }
 
+        if (!JWT_SECRET) {
+            res.status(500).json({ message: "jwt secret tidak ada" })
+        }
+
         const token = jwt.sign(
             { id: user.id, email: user.email },
             JWT_SECRET,
