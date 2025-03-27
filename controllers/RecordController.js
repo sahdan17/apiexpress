@@ -494,3 +494,24 @@ exports.deleteRoute = async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 }
+
+exports.renameRoute = async (req, res) => {
+    const { id, name } = req.body
+
+    try {
+        const route = await Routes.findByPk(id)
+        if (!route) {
+            return res.status(404).json({ message: "Route tidak ditemukan di database" })
+        }
+
+        route.name = name
+        await route.save()
+
+        res.json({
+            message: "Berhasil mengganti nama route",
+            updated: { id, name }
+        })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}

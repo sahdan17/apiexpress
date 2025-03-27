@@ -10,7 +10,8 @@ const {
     convertKML,
     getRoutes,
     deleteRoute,
-    getGeofenceById
+    getGeofenceById,
+    renameRoute
 } = require('../controllers/RecordController')
 
 const authenticateToken = require('../middlewares/AuthMiddleware')
@@ -30,5 +31,6 @@ router.post('/getGeofenceById', authenticateToken, getGeofenceById)
 router.post('/getRoutes', authenticateToken, getRoutes)
 router.post('/deleteRoute', authenticateToken, deleteRoute)
 router.post('/convertKML', authenticateToken, upload.single("file"), convertKML)
+router.post('/renameRoute', authenticateToken, renameRoute)
 
 module.exports = router
