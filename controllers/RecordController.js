@@ -499,7 +499,7 @@ exports.renameRoute = async (req, res) => {
     const { id, name } = req.body
 
     try {
-        const route = await Routes.findByPk(id)
+        const route = await Routes.findOne({ where: { path_id: id } })
         if (!route) {
             return res.status(404).json({ message: "Route tidak ditemukan di database" })
         }
