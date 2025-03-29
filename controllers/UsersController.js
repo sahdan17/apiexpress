@@ -98,3 +98,25 @@ exports.login = async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 }
+
+exports.getUser = async (req, res) => {
+    try {
+        const user = req.user
+
+        if (!user) {
+            res.status(401).json({ message: 'User tidak ditemukan' })
+        }
+
+        const idUser = user.id
+
+        const userInfo = await Users.findByPk(idUser)
+
+        res.json({
+            name: userInfo.name,
+            email: userInfo.email,
+            role: userInfo.role
+        })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
