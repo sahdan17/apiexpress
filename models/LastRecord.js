@@ -27,6 +27,18 @@ const LastRecord = sequelize.define('lastrecord', {
         type: DataTypes.ENUM('start', 'stop', 'idle'),
         allowNull: false
     },
+    rpm: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    coolant_temp: {
+        type: DataTypes.DOUBLE(8, 2),
+        allowNull: false
+    },
+    fuel_consumption: {
+        type: DataTypes.DOUBLE(8, 2),
+        allowNull: false
+    },
     idDevice: {
         type: DataTypes.INTEGER,
         allowNull: false,

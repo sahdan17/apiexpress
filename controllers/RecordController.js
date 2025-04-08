@@ -16,7 +16,7 @@ const sequelize = require('../config/database')
 exports.storeRecord = async (req, res) => {
     try {
         const timestamp = moment().tz("Asia/Jakarta").format("YYYY-MM-DD HH:mm:ss")
-        const { lat, long, speed, sat, dir, status, idDevice } = req.body
+        const { lat, long, speed, sat, dir, status, rpm, temp, fuel, idDevice } = req.body
 
         const driveSesion = await DriveSession.findOne({
             where: {
@@ -41,6 +41,9 @@ exports.storeRecord = async (req, res) => {
             sat: sat,
             dir: dir,
             status: status,
+            rpm: rpm,
+            coolant_temp: temp,
+            fuel_consumption: fuel,
             idDevice: idDevice,
             idSession: idDS,
             timestamp: timestamp
@@ -55,6 +58,9 @@ exports.storeRecord = async (req, res) => {
             sat: sat,
             dir: dir,
             status: status,
+            rpm: rpm,
+            coolant_temp: temp,
+            fuel_consumption: fuel,
             timestamp: timestamp
         })
 
