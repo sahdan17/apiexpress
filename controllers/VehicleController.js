@@ -64,3 +64,19 @@ exports.updateVehicle = async (req, res) => {
         res.status(500).send({ message: error.message })
     }
 }
+
+exports.deleteVehicle = async (req, res) => {
+    try {
+        const { id } = req.body
+
+        await Vehicle.destroy({
+            where: {
+                id: id
+            }
+        })
+
+        res.json({ message: "Hapus kendaraan berhasil" })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
