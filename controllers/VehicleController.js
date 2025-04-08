@@ -48,7 +48,7 @@ exports.updateVehicle = async (req, res) => {
     try {
         const { id, nopol, kode } = req.body
 
-        const vehicle = Vehicle.findByPk(id)
+        const vehicle = await Vehicle.findByPk(id)
 
         if (!vehicle) {
             res.status(500).json({ message: "Kendaraan tidak ditemukan" })
@@ -56,6 +56,7 @@ exports.updateVehicle = async (req, res) => {
 
         vehicle.nopol = nopol
         vehicle.kode = kode
+
         await vehicle.save()
 
         res.json(vehicle)
