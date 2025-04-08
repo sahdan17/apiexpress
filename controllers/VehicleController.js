@@ -43,3 +43,23 @@ exports.storeVehicle = async (req, res) => {
         res.status(500).send({ message: error.message })
     }
 }
+
+exports.updateVehicle = async (req, res) => {
+    try {
+        const { id, nopol, kode } = req.body
+
+        const vehicle = Vehicle.findByPk(id)
+
+        if (!vehicle) {
+            res.status(500).json({ message: "Kendaraan tidak ditemukan" })
+        }
+
+        vehicle.nopol = nopol
+        vehicle.kode = kode
+        await vehicle.save()
+
+        res.json(vehicle)
+    } catch (error) {
+        res.status(500).send({ message: error.message })
+    }
+}
