@@ -17,7 +17,7 @@ const Vehicle = sequelize.define('vehicle', {
         allowNull: false
     },
     cat: {
-        type: DataTypes.ENUM('krp', 'vt'),
+        type: DataTypes.STRING(10),
         allowNull: false
     }
 }, {
