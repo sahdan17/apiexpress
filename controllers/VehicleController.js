@@ -13,10 +13,16 @@ exports.getVehicle = async (req, res) => {
                     as: 'category'
                 }
             ],
-            raw: true
         })
 
-        res.json(vehicle)
+        const flattened = vehicles.map(v => ({
+            id: v.id,
+            name: v.name,
+            cat: v.cat,
+            category: v.category?.category || null
+        }))
+
+        res.json(flattened)
     } catch (error) {
         res.status(500).send({ message: error.message })
     }
