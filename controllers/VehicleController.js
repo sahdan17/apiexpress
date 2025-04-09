@@ -107,3 +107,19 @@ exports.deleteVehicle = async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 }
+
+exports.deleteVehicleInCat = async (req, res) => {
+    try {
+        const { cat } = req.body
+
+        await Vehicle.destroy({
+            where: {
+                cat: cat
+            }
+        })
+
+        res.json({ message: "Hapus kendaraan berhasil" })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
