@@ -10,7 +10,7 @@ exports.getVehicle = async (req, res) => {
                 {
                     model: Category,
                     attributes: [['nama_cat', 'category']],
-                    // as: 'category'
+                    as: 'category'
                 }
             ]
         })
