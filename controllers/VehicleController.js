@@ -17,7 +17,8 @@ exports.getVehicle = async (req, res) => {
 
         const flattened = vehicle.map(v => ({
             id: v.id,
-            name: v.name,
+            nopol: v.nopol,
+            kode: v.kode,
             cat: v.cat,
             category: v.category.nama_cat
         }))
