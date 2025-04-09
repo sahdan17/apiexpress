@@ -22,7 +22,7 @@ exports.getVehicle = async (req, res) => {
             category: v.category.nama_cat
         }))
 
-        res.json([flattened, vehicle])
+        res.json(flattened)
     } catch (error) {
         res.status(500).send({ message: error.message })
     }
