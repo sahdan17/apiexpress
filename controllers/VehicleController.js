@@ -29,6 +29,16 @@ exports.getVehicle = async (req, res) => {
     }
 }
 
+exports.getCategory = async (req, res) => {
+    try {
+        const category = await Category.findAll()
+
+        res.json(category)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
 exports.getVehicleByCat = async (req, res) => {
     try {
         const { cat } = req.body
