@@ -18,6 +18,17 @@ exports.storeRecord = async (req, res) => {
         const timestamp = moment().tz("Asia/Jakarta").format("YYYY-MM-DD HH:mm:ss")
         const { lat, long, speed, sat, dir, status, rpm, temp, fuel, idDevice } = req.body
 
+        const dataDir = path.join(__dirname, "../data")
+        const filePath = path.join(dataDir, `last_position_${idDevice}.json`)
+
+        if (status === "idle" || status === "stop") {
+            if (fs.existsSync(filePath)) {
+                const lastData = JSON.parse(fs.readFileSync(filePath, "utf-8"))
+                lat = lastData.lat
+                long = lastData.long
+            }
+        }
+
         const driveSesion = await DriveSession.findOne({
             where: {
                 vehicle_id: idDevice,
@@ -63,6 +74,18 @@ exports.storeRecord = async (req, res) => {
             fuel_consumption: fuel,
             timestamp: timestamp
         })
+
+        if (!fs.existsSync(dataDir)) {
+            fs.mkdirSync(dataDir, { recursive: true })
+        }
+
+        const fileData = {
+            idDevice,
+            lat,
+            long,
+            timestamp
+        }
+        fs.writeFileSync(filePath, JSON.stringify(fileData, null, 2))
 
         const areaCheckResult = await checkAreaInternal(lat, long)
 
