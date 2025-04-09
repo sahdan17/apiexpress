@@ -13,8 +13,7 @@ exports.getVehicle = async (req, res) => {
                     as: 'category'
                 }
             ],
-            raw: true,
-            nest: true
+            raw: true
         })
 
         res.json(vehicle)
