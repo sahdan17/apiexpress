@@ -1,10 +1,18 @@
 const Vehicle = require('../models/Vehicle')
 const { Op } = require("sequelize")
 const moment = require('moment')
+const Category = require('../models/Category')
 
 exports.getVehicle = async (req, res) => {
     try {
-        const vehicle = await Vehicle.findAll()
+        const vehicle = await Vehicle.findAll({
+            include: [
+                {
+                    model: Category,
+                    as: 'category'
+                }
+            ]
+        })
 
         res.json(vehicle)
     } catch (error) {
