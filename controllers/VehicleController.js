@@ -12,7 +12,9 @@ exports.getVehicle = async (req, res) => {
                     attributes: [['nama_cat', 'category']],
                     as: 'category'
                 }
-            ]
+            ],
+            raw: true,
+            nest: true
         })
 
         res.json(vehicle)
