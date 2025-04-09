@@ -9,7 +9,7 @@ exports.getVehicle = async (req, res) => {
             include: [
                 {
                     model: Category,
-                    attributes: [['nama_cat', 'category']],
+                    // attributes: [['nama_cat', 'category']],
                     as: 'category'
                 }
             ]
