@@ -9,7 +9,7 @@ exports.getVehicle = async (req, res) => {
             include: [
                 {
                     model: Category,
-                    attributes: [['nama_cat', 'category']],
+                    attributes: [['nama_cat']],
                     as: 'category'
                 }
             ],
@@ -19,7 +19,7 @@ exports.getVehicle = async (req, res) => {
             id: v.id,
             name: v.name,
             cat: v.cat,
-            category: v.category?.category || null
+            category: v.category.nama_cat
         }))
 
         res.json([flattened, vehicle])
