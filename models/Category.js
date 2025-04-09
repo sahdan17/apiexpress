@@ -9,6 +9,7 @@ const Category = sequelize.define('category', {
     },
     kode_cat: {
         type: DataTypes.STRING(10),
+        unique: true,
         allowNull: false
     },
     nama_cat: {
