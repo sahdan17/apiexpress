@@ -16,7 +16,7 @@ const sequelize = require('../config/database')
 exports.storeRecord = async (req, res) => {
     try {
         const timestamp = moment().tz("Asia/Jakarta").format("YYYY-MM-DD HH:mm:ss")
-        const { lat, long, speed, sat, dir, status, rpm, temp, fuel, idDevice } = req.body
+        let { lat, long, speed, sat, dir, status, rpm, temp, fuel, idDevice } = req.body
 
         const dataDir = path.join(__dirname, "../data")
         const filePath = path.join(dataDir, `last_position_${idDevice}.json`)
