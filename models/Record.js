@@ -18,31 +18,31 @@ const Record = sequelize.define('record', {
     },
     speed: {
         type: DataTypes.DOUBLE(8, 2),
-        allowNull: false
+        allowNull: true
     },
     sat: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: true
     },
     dir: {
         type: DataTypes.FLOAT,
-        allowNull: false
+        allowNull: true
     },
     status: {
         type: DataTypes.ENUM('start', 'stop', 'idle'),
-        allowNull: false
+        allowNull: true
     },
     rpm: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: true
     },
     coolant_temp: {
         type: DataTypes.DOUBLE(8, 2),
-        allowNull: false
+        allowNull: true
     },
     fuel_consumption: {
         type: DataTypes.DOUBLE(8, 2),
-        allowNull: false
+        allowNull: true
     },
     idDevice: {
         type: DataTypes.INTEGER,
