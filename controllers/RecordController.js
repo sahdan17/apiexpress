@@ -613,7 +613,7 @@ exports.deleteRoute = async (req, res) => {
 }  
 
 exports.renameRoute = async (req, res) => {
-    const { id, name } = req.body
+    const { id, name, tolerance } = req.body
 
     try {
         const route = await Routes.findOne({ where: { path_id: id } })
@@ -622,11 +622,45 @@ exports.renameRoute = async (req, res) => {
         }
 
         route.name = name
+        if (tolerance !== undefined) {
+            route.tolerance = tolerance
+        }
         await route.save()
 
+        const rutePath = path.join(__dirname, '..', 'kmz', 'rute_vt.json')
+        const polygonPath = path.join(__dirname, '..', 'kmz', 'polygon_vt.json')
+
+        const ruteData = JSON.parse(fs.readFileSync(rutePath, 'utf8'))
+        const polyline = ruteData[id]
+
+        if (!polyline) {
+            return res.status(404).json({ message: "Polyline tidak ditemukan dalam rute_vt.json" })
+        }
+
+        const line = turf.lineString(polyline)
+        const buffered = turf.buffer(line, tolerance, { units: 'meters' })
+
+        if (!buffered || !buffered.geometry || buffered.geometry.type !== 'Polygon') {
+            return res.status(500).json({ message: "Gagal membuat polygon dari polyline" })
+        }
+
+        let polygonData = []
+        if (fs.existsSync(polygonPath)) {
+            try {
+                polygonData = JSON.parse(fs.readFileSync(polygonPath, 'utf8'))
+                if (!Array.isArray(polygonData)) polygonData = []
+            } catch (err) {
+                polygonData = []
+            }
+        }
+
+        polygonData[id] = buffered.geometry.coordinates[0]
+
+        fs.writeFileSync(polygonPath, JSON.stringify(polygonData, null, 2), 'utf8')
+
         res.json({
-            message: "Berhasil mengganti nama route",
-            updated: { id, name }
+            message: "Berhasil mengganti nama dan tolerance route",
+            updated: { id, name, tolerance }
         })
     } catch (error) {
         res.status(500).json({ message: error.message })
