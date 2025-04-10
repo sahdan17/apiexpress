@@ -141,7 +141,7 @@ const checkAreaInternal = async (lat, long) => {
                 matchedIndex = index
             } else {
                 // Hitung jarak ke sisi polygon terdekat
-                const line = turf.lineString(coords.map(([lat, lng]) => [lng, lat]))
+                const line = turf.lineString(coords)
                 const nearest = turf.nearestPointOnLine(line, point)
                 const distance = turf.distance(point, nearest, { units: "meters" })
 
