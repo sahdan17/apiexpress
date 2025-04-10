@@ -7,6 +7,8 @@ const {
     formatKML, 
     checkArea, 
     getGeofence, 
+    getPolygon,
+    getPolygonById,
     convertKML,
     getRoutes,
     deleteRoute,
@@ -28,6 +30,8 @@ router.post('/history', authenticateToken, getHistory)
 // router.post('/checkArea', checkArea)
 router.post('/getGeofence', authenticateToken, getGeofence)
 router.post('/getGeofenceById', authenticateToken, getGeofenceById)
+router.post('/getPolygon', authenticateToken, getPolygon)
+router.post('/getPolygonById', authenticateToken, getPolygonById)
 router.post('/getRoutes', authenticateToken, getRoutes)
 router.post('/deleteRoute', authenticateToken, deleteRoute)
 router.post('/convertKML', authenticateToken, upload.single("file"), convertKML)

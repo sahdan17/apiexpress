@@ -255,6 +255,45 @@ exports.getGeofenceById = async (req, res) => {
     }
 }
 
+exports.getPolygon = async (req, res) => {
+    try {
+        const data = fs.readFileSync("./kmz/polygon_vt.json", "utf8")
+        const geofenceArray = JSON.parse(data)
+
+        if (!Array.isArray(geofenceArray)) {
+            return res.status(500).json({ message: "Invalid geofence data format" })
+        }
+
+        res.json(geofenceArray)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
+exports.getPolygonById = async (req, res) => {
+    try {
+        const { id } = req.body
+        
+        const data = fs.readFileSync("./kmz/polygon_vt.json", "utf8")
+        const geofenceArray = JSON.parse(data)
+
+        if (!Array.isArray(geofenceArray)) {
+            return res.status(500).json({ message: "Invalid geofence data format" })
+        }
+
+        const ids = Array.isArray(id) ? id : [id]
+        const parsedIds = ids.map(i => parseInt(i)).filter(i => !isNaN(i))
+
+        const selectedGeofences = parsedIds
+            .map(index => geofenceArray[index])
+            .filter(item => item !== undefined)
+
+        res.json(selectedGeofences)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
 exports.getLatestRecords = async (req, res) => {
     try {
         const records = await LastRecord.findAll()
@@ -455,7 +494,7 @@ exports.convertKML = async (req, res) => {
 function makePolygon() {
     try {
         const tolerance = 20
-        
+
         const inputPath = path.join(__dirname, '..', 'kmz', 'rute_vt.json')
         const rawData = fs.readFileSync(inputPath, 'utf8')
         const polylineList = JSON.parse(rawData)
@@ -509,7 +548,6 @@ exports.deleteRoute = async (req, res) => {
 
         let existingData = JSON.parse(fs.readFileSync(outputFilePath, "utf8"))
 
-        // Validasi id yang valid
         const validIds = id.filter(idx => !isNaN(idx) && idx >= 0 && idx < existingData.length)
         if (validIds.length === 0) {
             return res.status(404).json({ message: "Tidak ada ID yang valid untuk dihapus" })
@@ -517,12 +555,10 @@ exports.deleteRoute = async (req, res) => {
 
         validIds.sort((a, b) => b - a)
 
-        // Hapus dari array JSON
         validIds.forEach(idx => {
             existingData.splice(idx, 1)
         })
 
-        // Reassign path_id ulang
         for (let i = 0; i < existingData.length; i++) {
             existingData[i].path_id = i
         }
