@@ -134,7 +134,7 @@ const checkAreaInternal = async (lat, long) => {
         let minDistance = Infinity
 
         polygons.forEach((coords, index) => {
-            const polygon = turf.polygon([coords.map(([lat, lng]) => [lng, lat])])
+            const polygon = turf.polygon([coords])
 
             if (turf.booleanPointInPolygon(point, polygon)) {
                 inArea = true
