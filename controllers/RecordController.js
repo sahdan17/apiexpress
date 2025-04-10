@@ -510,12 +510,11 @@ exports.convertKML = async (req, res) => {
     }
 }
 
-function makePolygon(tolerance, newPolylines, startIndex) {
+function makePolygon(tolerance, newPolygons, startIndex) {
     try {
         const outputPath = path.join(__dirname, '..', 'kmz', 'polygon_vt.json')
 
         let existingPolygons = []
-
         if (fs.existsSync(outputPath)) {
             const raw = fs.readFileSync(outputPath, 'utf8').trim()
             try {
@@ -526,33 +525,19 @@ function makePolygon(tolerance, newPolylines, startIndex) {
             }
         }
 
-        for (let i = 0; i < newPolylines.length; i++) {
-            const polyline = newPolylines[i]
+        for (let i = 0; i < newPolygons.length; i++) {
+            const rawCoords = newPolygons[i]
+            const line = turf.lineString(rawCoords)
+            const safeTolerance = tolerance === 0 ? 0.1 : tolerance
+            const buffered = turf.buffer(line, safeTolerance, { units: 'meters' })
 
-            if (tolerance === 0) {
-                let polygonCoords = [...rawCoords]
-
-                // Tutup polygon jika belum tertutup
-                const first = polygonCoords[0]
-                const last = polygonCoords[polygonCoords.length - 1]
-                if (first[0] !== last[0] || first[1] !== last[1]) {
-                    polygonCoords.push(first)
-                }
-
-                existingPolygons[startIndex + i] = polygonCoords
-            } else {
-                const line = turf.lineString(polyline)
-                const buffered = turf.buffer(line, tolerance, { units: 'meters' })
-
-                if (
-                    buffered &&
-                    buffered.geometry &&
-                    buffered.geometry.type === 'Polygon' &&
-                    buffered.geometry.coordinates.length > 0
-                ) {
-                    const polygon = buffered.geometry.coordinates[0]
-                    existingPolygons[startIndex + i] = polygon
-                }
+            if (
+                buffered &&
+                buffered.geometry &&
+                buffered.geometry.type === 'Polygon' &&
+                buffered.geometry.coordinates.length > 0
+            ) {
+                existingPolygons[startIndex + i] = buffered.geometry.coordinates[0]
             }
         }
 
