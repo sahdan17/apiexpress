@@ -502,8 +502,7 @@ function makePolygon() {
         const polygonCoordinates = []
 
         for (const polyline of polylineList) {
-            const geojsonCoords = polyline.map(([lat, lng]) => [lng, lat])
-            const line = turf.lineString(geojsonCoords)
+            const line = turf.lineString(polyline)
             const buffered = turf.buffer(line, tolerance, { units: 'meters' })
 
             if (
@@ -612,5 +611,43 @@ exports.renameRoute = async (req, res) => {
         })
     } catch (error) {
         res.status(500).json({ message: error.message })
+    }
+}
+
+exports.makePolygonn = (req, res) => {
+    try {
+        const { tolerance } = req.body
+
+        const inputPath = path.join(__dirname, '..', 'kmz', 'rute_vt.json')
+        const rawData = fs.readFileSync(inputPath, 'utf8')
+        const polylineList = JSON.parse(rawData)
+
+        const polygonCoordinates = []
+
+        for (const polyline of polylineList) {
+            const line = turf.lineString(polyline)
+            const buffered = turf.buffer(line, tolerance, { units: 'meters' })
+
+            if (
+                buffered &&
+                buffered.geometry &&
+                buffered.geometry.type === 'Polygon' &&
+                buffered.geometry.coordinates.length > 0
+            ) {
+                polygonCoordinates.push(buffered.geometry.coordinates[0])
+            }
+        }
+
+        const outputPath = path.join(__dirname, '..', 'kmz', 'polygon_vt.json')
+        fs.writeFileSync(outputPath, JSON.stringify(polygonCoordinates, null, 2), 'utf8')
+
+        res.json({
+            status: 'success',
+            message: 'Berhasil mengubah polyline menjadi polygon dan menyimpan ke polygon_vt.json',
+            total: polygonCoordinates.length
+        })
+    } catch (err) {
+        console.error('❌ Error:', err)
+        res.status(500).json({ status: 'error', message: err.message })
     }
 }
