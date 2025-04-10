@@ -396,6 +396,8 @@ exports.formatKML = async (req, res) => {
 
 exports.convertKML = async (req, res) => {
     try {
+        const { tolerance } = req.body
+
         if (!req.file) {
             return res.status(400).json({ message: "File KML belum diunggah" })
         }
@@ -478,7 +480,7 @@ exports.convertKML = async (req, res) => {
 
         fs.unlinkSync(inputFilePath)
 
-        makePolygon()
+        makePolygon(tolerance)
 
         res.json({
             message: "Konversi berhasil",
@@ -491,10 +493,8 @@ exports.convertKML = async (req, res) => {
     }
 }
 
-function makePolygon() {
+function makePolygon(tolerance) {
     try {
-        const tolerance = 20
-
         const inputPath = path.join(__dirname, '..', 'kmz', 'rute_vt.json')
         const rawData = fs.readFileSync(inputPath, 'utf8')
         const polylineList = JSON.parse(rawData)
