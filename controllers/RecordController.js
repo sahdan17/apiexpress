@@ -530,11 +530,16 @@ function makePolygon(tolerance, newPolylines, startIndex) {
             const polyline = newPolylines[i]
 
             if (tolerance === 0) {
-                // Anggap polyline sudah polygon (pastikan koordinat pertama == terakhir)
-                if (polyline.length > 2 && JSON.stringify(polyline[0]) !== JSON.stringify(polyline[polyline.length - 1])) {
-                    polyline.push(polyline[0]) // Tutup polygon
+                let polygonCoords = [...rawCoords]
+
+                // Tutup polygon jika belum tertutup
+                const first = polygonCoords[0]
+                const last = polygonCoords[polygonCoords.length - 1]
+                if (first[0] !== last[0] || first[1] !== last[1]) {
+                    polygonCoords.push(first)
                 }
-                existingPolygons[startIndex + i] = polyline
+
+                existingPolygons[startIndex + i] = polygonCoords
             } else {
                 const line = turf.lineString(polyline)
                 const buffered = turf.buffer(line, tolerance, { units: 'meters' })
