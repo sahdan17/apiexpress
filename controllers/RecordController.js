@@ -547,7 +547,7 @@ exports.getRouteById = async (req, res) => {
 
         const routes = await Routes.find({
             where: {
-                id: id
+                path_id: id
             }
         })
 
