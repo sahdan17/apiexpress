@@ -170,31 +170,31 @@ exports.checkArea = async (req, res) => {
 
         const areaCheckResult = await checkAreaInternal(lat, lng)
 
-        if (areaCheckResult.inArea == false) {
-            try {
-                const vehicle = await Vehicle.findOne({
-                    where: {
-                        id: 1
-                    }
-                })
+        // if (areaCheckResult.inArea == false) {
+        //     try {
+        //         const vehicle = await Vehicle.findOne({
+        //             where: {
+        //                 id: 1
+        //             }
+        //         })
 
-                await axios.post("https://foljambiold.findingoillosses.com/api/sendToDB",
-                    {
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Accept": "application/json",
-                            "Access-Control-Allow-Origin": "*"
-                        }
-                    },
-                    {
-                        message: `${vehicle.nopol} | ${vehicle.kode} melintas di luar jalur`,
-                        target: "120363288603708376@g.us"
-                    }
-                )
-            } catch (err) {
-                res.status(500).json({ message: err.message })
-            }
-        }
+        //         await axios.post("https://foljambiold.findingoillosses.com/api/sendToDB",
+        //             {
+        //                 headers: {
+        //                     "Content-Type": "application/json",
+        //                     "Accept": "application/json",
+        //                     "Access-Control-Allow-Origin": "*"
+        //                 }
+        //             },
+        //             {
+        //                 message: `${vehicle.nopol} | ${vehicle.kode} melintas di luar jalur`,
+        //                 target: "120363288603708376@g.us"
+        //             }
+        //         )
+        //     } catch (err) {
+        //         res.status(500).json({ message: err.message })
+        //     }
+        // }
 
         res.json(areaCheckResult)
     } catch (error) {
