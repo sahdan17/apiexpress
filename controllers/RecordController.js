@@ -528,16 +528,33 @@ function makePolygon(tolerance, newPolylines, startIndex) {
 
         for (let i = 0; i < newPolylines.length; i++) {
             const polyline = newPolylines[i]
-            const line = turf.lineString(polyline)
-            const buffered = turf.buffer(line, tolerance, { units: 'meters' })
+            let polygon = null
 
-            if (
-                buffered &&
-                buffered.geometry &&
-                buffered.geometry.type === 'Polygon' &&
-                buffered.geometry.coordinates.length > 0
-            ) {
-                const polygon = buffered.geometry.coordinates[0]
+            if (tolerance === 0) {
+                // Jika tolerance = 0, langsung jadikan sebagai "polygon sederhana"
+                // Pastikan tertutup: titik pertama dan terakhir harus sama
+                const closedLine = [...polyline]
+                const first = polyline[0]
+                const last = polyline[polyline.length - 1]
+                if (first[0] !== last[0] || first[1] !== last[1]) {
+                    closedLine.push(first) // tutup loop polygon
+                }
+                polygon = closedLine
+            } else {
+                const line = turf.lineString(polyline)
+                const buffered = turf.buffer(line, tolerance, { units: 'meters' })
+
+                if (
+                    buffered &&
+                    buffered.geometry &&
+                    buffered.geometry.type === 'Polygon' &&
+                    buffered.geometry.coordinates.length > 0
+                ) {
+                    polygon = buffered.geometry.coordinates[0]
+                }
+            }
+
+            if (polygon) {
                 existingPolygons[startIndex + i] = polygon
             }
         }
