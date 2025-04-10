@@ -461,7 +461,7 @@ exports.convertKML = async (req, res) => {
 
             newCoordinates.push(coords)
 
-            routesToInsert.push(`(${pathId}, '${nameText.replace(/'/g, "''")}')`)
+            routesToInsert.push(`(${pathId}, '${nameText.replace(/'/g, "''")}', ${tolerance})`)
         }
 
         if (newCoordinates.length === 0) {
@@ -474,7 +474,7 @@ exports.convertKML = async (req, res) => {
         fs.writeFileSync(outputFilePath, JSON.stringify(existingData, null, 2))
 
         if (routesToInsert.length > 0) {
-            const query = `INSERT INTO routes (path_id, name) VALUES ${routesToInsert.join(", ")}`
+            const query = `INSERT INTO routes (path_id, name, tolerance) VALUES ${routesToInsert.join(", ")}`
             await sequelize.query(query, { type: QueryTypes.INSERT })
         }
 
