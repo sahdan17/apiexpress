@@ -446,7 +446,6 @@ exports.convertKML = async (req, res) => {
 
             let coords = []
 
-            // Cek apakah ini LineString atau Polygon
             const lineStringEl = placemark.getElementsByTagName("LineString")[0]
             const polygonEl = placemark.getElementsByTagName("Polygon")[0]
 
@@ -472,7 +471,7 @@ exports.convertKML = async (req, res) => {
                     return [x, y]
                 })
             } else {
-                continue // jika bukan LineString atau Polygon
+                continue
             }
 
             const pathId = existingData.length + newCoordinates.length
@@ -527,21 +526,26 @@ function makePolygon(tolerance, newPolylines, startIndex) {
             }
         }
 
-        for (let i = 0; i < newPolylines.length; i++) {
-            const polyline = newPolylines[i]
-            const line = turf.lineString(polyline)
-            const buffered = turf.buffer(line, tolerance, { units: 'meters' })
-
-            if (
-                buffered &&
-                buffered.geometry &&
-                buffered.geometry.type === 'Polygon' &&
-                buffered.geometry.coordinates.length > 0
-            ) {
-                const polygon = buffered.geometry.coordinates[0]
-                existingPolygons[startIndex + i] = polygon
+        for (let i = 0; i < newCoordinates.length; i++) {
+            const polyline = newCoordinates[i]
+        
+            // Jika tolerance == 0 → simpan langsung (anggap sudah polygon)
+            if (tolerance === 0) {
+                polygonCoordinates[startIndex + i] = polyline
+            } else {
+                const line = turf.lineString(polyline)
+                const buffered = turf.buffer(line, tolerance, { units: "meters" })
+        
+                if (
+                    buffered &&
+                    buffered.geometry &&
+                    buffered.geometry.type === 'Polygon' &&
+                    buffered.geometry.coordinates.length > 0
+                ) {
+                    polygonCoordinates[startIndex + i] = buffered.geometry.coordinates[0]
+                }
             }
-        }
+        }        
 
         fs.writeFileSync(outputPath, JSON.stringify(existingPolygons, null, 2), 'utf8')
     } catch (err) {
