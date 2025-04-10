@@ -528,7 +528,7 @@ function makePolygon(tolerance, newPolygons, startIndex) {
         for (let i = 0; i < newPolygons.length; i++) {
             const rawCoords = newPolygons[i]
             const line = turf.lineString(rawCoords)
-            const safeTolerance = parseFloat(tolerance) === 0 ? 0.5 : parseFloat(tolerance)
+            const safeTolerance = parseFloat(tolerance) === 0 ? 0.1 : parseFloat(tolerance)
             const buffered = turf.buffer(line, safeTolerance, { units: 'meters' })
 
             if (
