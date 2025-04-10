@@ -129,17 +129,27 @@ const checkAreaInternal = async (lat, long) => {
         const polygons = JSON.parse(data)
 
         const point = turf.point([long, lat])
-        let found = false
-        let matchIndex = -1
+        let inArea = false
+        let matchedIndex = -1
+        let minDistance = Infinity
 
-        for (let i = 0; i < polygons.length; i++) {
-            const polygon = turf.polygon([polygons[i]])
+        polygons.forEach((coords, index) => {
+            const polygon = turf.polygon([coords.map(([lat, lng]) => [lng, lat])])
+
             if (turf.booleanPointInPolygon(point, polygon)) {
-                found = true
-                matchIndex = i
-                break
+                inArea = true
+                matchedIndex = index
+            } else {
+                // Hitung jarak ke sisi polygon terdekat
+                const line = turf.lineString(coords.map(([lat, lng]) => [lng, lat]))
+                const nearest = turf.nearestPointOnLine(line, point)
+                const distance = turf.distance(point, nearest, { units: "meters" })
+
+                if (distance < minDistance) {
+                    minDistance = distance
+                }
             }
-        }
+        })
 
         return {
             point: { latitude: lat, longitude: long },
