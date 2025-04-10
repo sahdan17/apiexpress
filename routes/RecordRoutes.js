@@ -11,6 +11,7 @@ const {
     getPolygonById,
     convertKML,
     getRoutes,
+    getRouteById,
     deleteRoute,
     getGeofenceById,
     renameRoute,
@@ -34,6 +35,7 @@ router.post('/getGeofenceById', authenticateToken, getGeofenceById)
 router.post('/getPolygon', authenticateToken, getPolygon)
 router.post('/getPolygonById', authenticateToken, getPolygonById)
 router.post('/getRoutes', authenticateToken, getRoutes)
+router.post('/getRouteById', authenticateToken, getRouteById)
 router.post('/deleteRoute', authenticateToken, deleteRoute)
 router.post('/convertKML', authenticateToken, upload.single("file"), convertKML)
 router.post('/renameRoute', authenticateToken, renameRoute)

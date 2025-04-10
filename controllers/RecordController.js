@@ -2,7 +2,7 @@ const Record = require('../models/Record')
 const LastRecord = require('../models/LastRecord')
 const Vehicle = require('../models/Vehicle')
 const Routes = require('../models/Routes')
-const { Op, QueryTypes } = require("sequelize")
+const { Op, QueryTypes, where } = require("sequelize")
 const moment = require('moment')
 const fs = require("fs")
 const turf = require("@turf/turf")
@@ -534,6 +534,22 @@ function makePolygon(tolerance, newPolylines, startIndex) {
 exports.getRoutes = async (req, res) => {
     try {
         const routes = await Routes.findAll()
+
+        res.json({ routes: routes })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
+exports.getRouteById = async (req, res) => {
+    try {
+        const { id } = req.body
+
+        const routes = await Routes.find({
+            where: {
+                id: id
+            }
+        })
 
         res.json({ routes: routes })
     } catch (error) {
