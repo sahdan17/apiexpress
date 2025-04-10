@@ -535,7 +535,7 @@ exports.getRoutes = async (req, res) => {
 exports.deleteRoute = async (req, res) => {
     try {
         let { id } = req.body
-
+    
         if (!Array.isArray(id)) {
             id = [parseInt(id)]
         } else {
@@ -543,26 +543,36 @@ exports.deleteRoute = async (req, res) => {
         }
 
         const kmzFolderPath = path.join(__dirname, "../kmz")
-        const outputFilePath = path.join(kmzFolderPath, "rute_vt.json")
+        const rutePath = path.join(kmzFolderPath, "rute_vt.json")
+        const polygonPath = path.join(kmzFolderPath, "polygon_vt.json")
+    
+        let ruteData = JSON.parse(fs.readFileSync(rutePath, "utf8"))
+        let polygonData = []
 
-        let existingData = JSON.parse(fs.readFileSync(outputFilePath, "utf8"))
-
-        const validIds = id.filter(idx => !isNaN(idx) && idx >= 0 && idx < existingData.length)
+        if (fs.existsSync(polygonPath)) {
+            polygonData = JSON.parse(fs.readFileSync(polygonPath, "utf8"))
+        }
+    
+        const validIds = id.filter(idx => !isNaN(idx) && idx >= 0 && idx < ruteData.length)
         if (validIds.length === 0) {
             return res.status(404).json({ message: "Tidak ada ID yang valid untuk dihapus" })
         }
 
         validIds.sort((a, b) => b - a)
-
+    
         validIds.forEach(idx => {
-            existingData.splice(idx, 1)
+            ruteData.splice(idx, 1)
+            if (idx < polygonData.length) {
+                polygonData.splice(idx, 1)
+            }
         })
 
-        for (let i = 0; i < existingData.length; i++) {
-            existingData[i].path_id = i
+        for (let i = 0; i < ruteData.length; i++) {
+            ruteData[i].path_id = i
         }
-
-        fs.writeFileSync(outputFilePath, JSON.stringify(existingData, null, 2))
+    
+        fs.writeFileSync(rutePath, JSON.stringify(ruteData, null, 2))
+        fs.writeFileSync(polygonPath, JSON.stringify(polygonData, null, 2))
 
         await Routes.destroy({
             where: {
@@ -575,23 +585,23 @@ exports.deleteRoute = async (req, res) => {
         const minDeleted = Math.min(...validIds)
 
         await Routes.increment('path_id', {
-            by: -validIds.length,
-            where: {
-                path_id: {
-                    [Op.gt]: minDeleted
-                }
+        by: -validIds.length,
+        where: {
+            path_id: {
+                [Op.gt]: minDeleted
             }
-        })
+        }
+    })
 
-        res.json({
-            message: `Berhasil menghapus ${validIds.length} path dan menyusun ulang path_id`,
-            deleted_ids: validIds
-        })
+    res.json({
+        message: `Berhasil menghapus ${validIds.length} path dan polygon, serta menyusun ulang path_id`,
+        deleted_ids: validIds
+    })
     } catch (error) {
         console.error("Error saat menghapus route:", error)
         res.status(500).json({ message: error.message })
     }
-}
+}  
 
 exports.renameRoute = async (req, res) => {
     const { id, name } = req.body
