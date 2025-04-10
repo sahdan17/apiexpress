@@ -2,7 +2,7 @@ const Record = require('../models/Record')
 const LastRecord = require('../models/LastRecord')
 const Vehicle = require('../models/Vehicle')
 const Routes = require('../models/Routes')
-const { Op, Sequelize, QueryTypes } = require("sequelize")
+const { Op, QueryTypes } = require("sequelize")
 const moment = require('moment')
 const fs = require("fs")
 const turf = require("@turf/turf")
@@ -439,6 +439,8 @@ exports.convertKML = async (req, res) => {
 
         fs.unlinkSync(inputFilePath)
 
+        makePolygon()
+
         res.json({
             message: "Konversi berhasil",
             filePath: outputFilePath,
@@ -447,6 +449,38 @@ exports.convertKML = async (req, res) => {
         })
     } catch (error) {
         res.status(500).json({ message: error.message })
+    }
+}
+
+function makePolygon() {
+    try {
+        const tolerance = 20
+        
+        const inputPath = path.join(__dirname, '..', 'kmz', 'rute_vt.json')
+        const rawData = fs.readFileSync(inputPath, 'utf8')
+        const polylineList = JSON.parse(rawData)
+
+        const polygonCoordinates = []
+
+        for (const polyline of polylineList) {
+            const geojsonCoords = polyline.map(([lat, lng]) => [lng, lat])
+            const line = turf.lineString(geojsonCoords)
+            const buffered = turf.buffer(line, tolerance, { units: 'meters' })
+
+            if (
+                buffered &&
+                buffered.geometry &&
+                buffered.geometry.type === 'Polygon' &&
+                buffered.geometry.coordinates.length > 0
+            ) {
+                polygonCoordinates.push(buffered.geometry.coordinates[0])
+            }
+        }
+
+        const outputPath = path.join(__dirname, '..', 'kmz', 'polygon_vt.json')
+        fs.writeFileSync(outputPath, JSON.stringify(polygonCoordinates, null, 2), 'utf8')
+    } catch (err) {
+        console.error('❌ Error:', err)
     }
 }
 
