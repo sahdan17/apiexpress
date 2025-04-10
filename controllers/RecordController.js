@@ -153,9 +153,12 @@ const checkAreaInternal = async (lat, long) => {
 
         return {
             point: { latitude: lat, longitude: long },
-            inArea: found,
-            index: matchIndex,
-            message: found ? "Titik berada dalam polygon" : "Titik berada di luar area"
+            inArea,
+            index: matchedIndex,
+            distance: inArea ? 0 : minDistance.toFixed(2),
+            message: inArea
+                ? "Titik berada dalam polygon"
+                : `Titik berada di luar area, jarak terdekat ${minDistance.toFixed(2)} meter`
         }
     } catch (error) {
         return { message: "Gagal memeriksa area", error: error.message }
