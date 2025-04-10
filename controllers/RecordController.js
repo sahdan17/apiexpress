@@ -528,18 +528,13 @@ function makePolygon(tolerance, newPolylines, startIndex) {
 
         for (let i = 0; i < newPolylines.length; i++) {
             const polyline = newPolylines[i]
-            let polygon = null
 
             if (tolerance === 0) {
-                // Gunakan langsung sebagai polygon tanpa buffering
-                const closed = [...polyline]
-                const first = closed[0]
-                const last = closed[closed.length - 1]
-                if (first[0] !== last[0] || first[1] !== last[1]) {
-                    closed.push(first)
+                // Anggap polyline sudah polygon (pastikan koordinat pertama == terakhir)
+                if (polyline.length > 2 && JSON.stringify(polyline[0]) !== JSON.stringify(polyline[polyline.length - 1])) {
+                    polyline.push(polyline[0]) // Tutup polygon
                 }
-
-                polygon = closed
+                existingPolygons[startIndex + i] = polyline
             } else {
                 const line = turf.lineString(polyline)
                 const buffered = turf.buffer(line, tolerance, { units: 'meters' })
@@ -550,18 +545,15 @@ function makePolygon(tolerance, newPolylines, startIndex) {
                     buffered.geometry.type === 'Polygon' &&
                     buffered.geometry.coordinates.length > 0
                 ) {
-                    polygon = buffered.geometry.coordinates[0]
+                    const polygon = buffered.geometry.coordinates[0]
+                    existingPolygons[startIndex + i] = polygon
                 }
-            }
-
-            if (polygon) {
-                existingPolygons[startIndex + i] = polygon
             }
         }
 
         fs.writeFileSync(outputPath, JSON.stringify(existingPolygons, null, 2), 'utf8')
     } catch (err) {
-        console.error('❌ Error in makePolygon:', err.message)
+        console.error('❌ Error in makePolygon:', err)
     }
 }
 
