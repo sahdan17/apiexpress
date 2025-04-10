@@ -123,6 +123,35 @@ exports.storeRecord = async (req, res) => {
     }
 }
 
+const checkAreaInternal = async (lat, long) => {
+    try {
+        const data = fs.readFileSync("./kmz/polygon_vt.json", "utf8")
+        const polygons = JSON.parse(data)
+
+        const point = turf.point([long, lat])
+        let found = false
+        let matchIndex = -1
+
+        for (let i = 0; i < polygons.length; i++) {
+            const polygon = turf.polygon([polygons[i]])
+            if (turf.booleanPointInPolygon(point, polygon)) {
+                found = true
+                matchIndex = i
+                break
+            }
+        }
+
+        return {
+            point: { latitude: lat, longitude: long },
+            inArea: found,
+            index: matchIndex,
+            message: found ? "Titik berada dalam polygon" : "Titik berada di luar area"
+        }
+    } catch (error) {
+        return { message: "Gagal memeriksa area", error: error.message }
+    }
+}
+
 exports.checkArea = async (req, res) => {
     try {
         const { point } = req.body
@@ -170,49 +199,6 @@ exports.checkArea = async (req, res) => {
         res.json(areaCheckResult)
     } catch (error) {
         res.status(500).json({ message: error.message })
-    }
-}
-
-const checkAreaInternal = async (lat, long) => {
-    try {
-        // const data = fs.readFileSync("./kmz/pps-sgl.json", "utf8")
-        const data = fs.readFileSync("./kmz/rute_vt.json", "utf8")
-
-        const polylines = JSON.parse(data)
-
-        let nearestDistance = Infinity
-        let nearestPolyline = null
-
-        polylines.forEach(polyline => {
-            var line = turf.lineString(polyline)
-
-            const pt = turf.point([long, lat])
-            const nearestPoint = turf.nearestPointOnLine(line, pt)
-            const distance = turf.distance(pt, nearestPoint, { units: "meters" })
-
-            if (distance < nearestDistance) {
-                nearestDistance = distance
-                nearestPolyline = polyline
-            }
-        })
-
-        var check = nearestDistance <= 20
-        var message = ""
-
-        if (check) {
-            message = "Titik koordinat berada di dalam area"
-        } else {
-            message = "Titik koordinat berada di luar area"
-        }
-
-        return {
-            point: { latitude: lat, longitude: long },
-            distance: nearestDistance.toFixed(2),
-            inArea: check,
-            message: message
-        }
-    } catch (error) {
-        return { message: "Gagal memeriksa area", error: error.message }
     }
 }
 
