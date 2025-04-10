@@ -444,17 +444,36 @@ exports.convertKML = async (req, res) => {
             const nameElement = placemark.getElementsByTagName("name")[0]
             const nameText = nameElement ? nameElement.textContent.trim() : `Path ${i + 1}`
 
-            const coordinatesElement = placemark.getElementsByTagName("coordinates")[0]
-            if (!coordinatesElement) continue
+            let coords = []
 
-            const coordText = coordinatesElement.textContent.trim()
+            // Cek apakah ini LineString atau Polygon
+            const lineStringEl = placemark.getElementsByTagName("LineString")[0]
+            const polygonEl = placemark.getElementsByTagName("Polygon")[0]
 
-            if (!coordText) continue
+            if (lineStringEl) {
+                const coordEl = lineStringEl.getElementsByTagName("coordinates")[0]
+                if (!coordEl) continue
 
-            const coords = coordText.split(/\s+/).map(coord => {
-                const [x, y] = coord.split(",").map(Number)
-                return [x, y]
-            })
+                const coordText = coordEl.textContent.trim()
+                coords = coordText.split(/\s+/).map(coord => {
+                    const [x, y] = coord.split(",").map(Number)
+                    return [x, y]
+                })
+            } else if (polygonEl) {
+                const ringEl = polygonEl.getElementsByTagName("LinearRing")[0]
+                if (!ringEl) continue
+
+                const coordEl = ringEl.getElementsByTagName("coordinates")[0]
+                if (!coordEl) continue
+
+                const coordText = coordEl.textContent.trim()
+                coords = coordText.split(/\s+/).map(coord => {
+                    const [x, y] = coord.split(",").map(Number)
+                    return [x, y]
+                })
+            } else {
+                continue // jika bukan LineString atau Polygon
+            }
 
             const pathId = existingData.length + newCoordinates.length
 
