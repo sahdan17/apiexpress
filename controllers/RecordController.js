@@ -504,7 +504,7 @@ function makePolygon() {
         for (const polyline of polylineList) {
             const geojsonCoords = polyline.map(([lat, lng]) => [lng, lat])
             const line = turf.lineString(geojsonCoords)
-            const buffered = turf.buffer(line, 20, { units: 'meters' })
+            const buffered = turf.buffer(line, tolerance, { units: 'meters' })
 
             if (
                 buffered &&
