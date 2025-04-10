@@ -480,7 +480,7 @@ exports.convertKML = async (req, res) => {
 
         fs.unlinkSync(inputFilePath)
 
-        makePolygon(tolerance)
+        makePolygon(tolerance, newCoordinates, existingData.length - newCoordinates.length)
 
         res.json({
             message: "Konversi berhasil",
@@ -493,15 +493,24 @@ exports.convertKML = async (req, res) => {
     }
 }
 
-function makePolygon(tolerance) {
+function makePolygon(tolerance, newPolylines, startIndex) {
     try {
-        const inputPath = path.join(__dirname, '..', 'kmz', 'rute_vt.json')
-        const rawData = fs.readFileSync(inputPath, 'utf8')
-        const polylineList = JSON.parse(rawData)
+        const outputPath = path.join(__dirname, '..', 'kmz', 'polygon_vt.json')
 
-        const polygonCoordinates = []
+        let existingPolygons = []
 
-        for (const polyline of polylineList) {
+        if (fs.existsSync(outputPath)) {
+            const raw = fs.readFileSync(outputPath, 'utf8').trim()
+            try {
+                existingPolygons = raw ? JSON.parse(raw) : []
+                if (!Array.isArray(existingPolygons)) existingPolygons = []
+            } catch (err) {
+                existingPolygons = []
+            }
+        }
+
+        for (let i = 0; i < newPolylines.length; i++) {
+            const polyline = newPolylines[i]
             const line = turf.lineString(polyline)
             const buffered = turf.buffer(line, tolerance, { units: 'meters' })
 
@@ -511,14 +520,14 @@ function makePolygon(tolerance) {
                 buffered.geometry.type === 'Polygon' &&
                 buffered.geometry.coordinates.length > 0
             ) {
-                polygonCoordinates.push(buffered.geometry.coordinates[0])
+                const polygon = buffered.geometry.coordinates[0]
+                existingPolygons[startIndex + i] = polygon
             }
         }
 
-        const outputPath = path.join(__dirname, '..', 'kmz', 'polygon_vt.json')
-        fs.writeFileSync(outputPath, JSON.stringify(polygonCoordinates, null, 2), 'utf8')
+        fs.writeFileSync(outputPath, JSON.stringify(existingPolygons, null, 2), 'utf8')
     } catch (err) {
-        console.error('❌ Error:', err)
+        console.error('❌ Error in makePolygon:', err)
     }
 }
 
