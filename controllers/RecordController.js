@@ -699,6 +699,63 @@ exports.renameRoute = async (req, res) => {
     }
 }
 
+exports.updateTolerance = async (req, res) => {
+    try {
+        const { tolerance, ids } = req.body
+
+        if (!Array.isArray(ids) || typeof tolerance !== "number") {
+            return res.status(400).json({ message: "Format body salah. 'ids' harus array dan 'tolerance' harus number." })
+        }
+
+        const updatedRoutes = []
+
+        const rutePath = path.join(__dirname, '..', 'kmz', 'rute_vt.json')
+        const polygonPath = path.join(__dirname, '..', 'kmz', 'polygon_vt.json')
+
+        const ruteData = JSON.parse(fs.readFileSync(rutePath, 'utf8'))
+        let polygonData = []
+
+        if (fs.existsSync(polygonPath)) {
+            try {
+                polygonData = JSON.parse(fs.readFileSync(polygonPath, 'utf8'))
+                if (!Array.isArray(polygonData)) polygonData = []
+            } catch (err) {
+                polygonData = []
+            }
+        }
+
+        for (const id of ids) {
+            const route = await Routes.findOne({ where: { path_id: id } })
+            if (!route) continue
+
+            route.tolerance = tolerance
+            await route.save()
+
+            const polyline = ruteData[id]
+            if (!polyline) continue
+
+            const line = turf.lineString(polyline)
+            const buffered = turf.buffer(line, tolerance, { units: "meters" })
+
+            if (buffered && buffered.geometry?.type === "Polygon") {
+                polygonData[id] = buffered.geometry.coordinates[0]
+            }
+
+            updatedRoutes.push({ id, name: route.name, tolerance })
+        }
+
+        fs.writeFileSync(polygonPath, JSON.stringify(polygonData, null, 2), 'utf8')
+
+        return res.json({
+            message: "Berhasil mengupdate tolerance beberapa route",
+            updated: updatedRoutes
+        })
+    } catch (error) {
+        console.error(error)
+        return res.status(500).json({ message: error.message })
+    }
+}
+
 exports.makePolygonn = (req, res) => {
     try {
         const { tolerance } = req.body

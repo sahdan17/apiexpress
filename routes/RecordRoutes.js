@@ -15,6 +15,7 @@ const {
     deleteRoute,
     getGeofenceById,
     renameRoute,
+    updateTolerance,
     makePolygonn
 } = require('../controllers/RecordController')
 
@@ -39,6 +40,7 @@ router.post('/getRouteById', authenticateToken, getRouteById)
 router.post('/deleteRoute', authenticateToken, deleteRoute)
 router.post('/convertKML', authenticateToken, upload.single("file"), convertKML)
 router.post('/renameRoute', authenticateToken, renameRoute)
+router.post('/updateTolerance', authenticateToken, updateTolerance)
 router.post('/makePolygon', makePolygonn)
 
 module.exports = router
