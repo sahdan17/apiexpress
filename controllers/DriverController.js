@@ -64,6 +64,43 @@ exports.createDriver = async (req, res) => {
     }
 }
 
+exports.updateDriver = async (req, res) => {
+    try {
+        const { id, driver_name, no_wa } = req.body
+
+        const driver = Driver.findByPk(id)
+
+        if (!driver) {
+            res.status(500).json({ message: "Driver tidak ditemukan" })
+        }
+
+        driver.driver_name = driver_name
+        driver.no_wa = no_wa
+
+        await driver.save()
+
+        res.json(driver)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
+exports.deleteDriver = async (req, res) => {
+    try {
+        const { id } = req.body
+
+        await Driver.destroy({
+            where: {
+                id: id
+            }
+        })
+
+        res.json({ message: "Hapus driver berhasil" })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
 exports.driveSession = async (req, res) => {
     try {
         const timestamp = moment().tz("Asia/Jakarta").format("YYYY-MM-DD HH:mm:ss")
