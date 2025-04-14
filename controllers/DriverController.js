@@ -68,7 +68,7 @@ exports.updateDriver = async (req, res) => {
     try {
         const { id, driver_name, no_wa } = req.body
 
-        const driver = Driver.findByPk(id)
+        const driver = await Driver.findByPk(id)
 
         if (!driver) {
             res.status(500).json({ message: "Driver tidak ditemukan" })
