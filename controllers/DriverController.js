@@ -4,6 +4,16 @@ const DriveSession = require('../models/DriveSession')
 const { Op } = require("sequelize")
 const moment = require('moment')
 
+exports.getDriver = async (req, res) => {
+    try {
+        const driver = await Driver.findAll()
+
+        res.json(driver)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
 exports.storeRFIDTemp = async (req, res) => {
     try {
         const { rfid } = req.body
