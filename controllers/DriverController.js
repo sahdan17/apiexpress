@@ -18,20 +18,30 @@ exports.storeRFIDTemp = async (req, res) => {
     try {
         const { rfid } = req.body
 
-        const rfidTemp = await RFIDTemp.findAll()
+        await RFIDTemp.destroy({ where: {} })
 
-        if (rfidTemp.length == 0) {
-            await RFIDTemp.create({
-                rfid: rfid,
-            })
-        } else {
-            res.status(500).json({ message: "Selesaikan pendaftaran RFID sebelumnya" })
-        }
+        await RFIDTemp.create({
+            rfid: rfid,
+        })
 
         res.json({
             status: "success",
             message: "Data berhasil disimpan"
         })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
+exports.checkRFIDTemp = async (req, res) => {
+    try {
+        const rfidTemp = await RFIDTemp.findAll()
+
+        if (rfidTemp.length == 0) {
+            res.status(500).json({ message: "RFID kosong" })
+        }
+
+        res.json(rfidTemp)
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
