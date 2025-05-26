@@ -16,7 +16,7 @@ const sequelize = require('../config/database')
 exports.storeRecord = async (req, res) => {
     try {
         const timestamp = moment().tz("Asia/Jakarta").format("YYYY-MM-DD HH:mm:ss")
-        let { lat, long, speed, sat, dir, status, rpm, temp, fuel, idDevice } = req.body
+        let { lat, long, speed, sat, dir, status, rpm, temp, fuel, tank, temp_tank, idDevice } = req.body
 
         const dataDir = path.join(__dirname, "../data")
         const filePath = path.join(dataDir, `last_position_${idDevice}.json`)
@@ -55,6 +55,8 @@ exports.storeRecord = async (req, res) => {
             rpm: rpm,
             coolant_temp: temp,
             fuel_consumption: fuel,
+            level_tank: tank,
+            temp_tank: temp_tank,
             idDevice: idDevice,
             idSession: idDS,
             timestamp: timestamp
@@ -72,6 +74,8 @@ exports.storeRecord = async (req, res) => {
             rpm: rpm,
             coolant_temp: temp,
             fuel_consumption: fuel,
+            level_tank: tank,
+            temp_tank: temp_tank,
             timestamp: timestamp
         })
 

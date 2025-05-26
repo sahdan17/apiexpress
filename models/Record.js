@@ -44,6 +44,14 @@ const Record = sequelize.define('record', {
         type: DataTypes.DOUBLE(8, 2),
         allowNull: true
     },
+    level_tank: {
+        type: DataTypes.DOUBLE(8, 2),
+        allowNull: true
+    },
+    temp_tank: {
+        type: DataTypes.DOUBLE(8, 2),
+        allowNull: true
+    },
     idDevice: {
         type: DataTypes.INTEGER,
         allowNull: false

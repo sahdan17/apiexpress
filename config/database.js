@@ -9,11 +9,11 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
     pool: {
         max: 10,
         min: 0,
-        acquire: 30000, // Waktu maksimum untuk mendapatkan koneksi
-        idle: 10000     // Waktu idle sebelum koneksi dihapus
+        acquire: 30000,
+        idle: 10000
     },
     retry: {
-        max: 5 // Coba ulang koneksi hingga 5 kali jika gagal
+        max: 5
     }
 })
 
