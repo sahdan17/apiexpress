@@ -15,10 +15,6 @@ const Vehicle = sequelize.define('vehicle', {
     kode: {
         type: DataTypes.STRING(255),
         allowNull: false
-    },
-    cat: {
-        type: DataTypes.STRING(10),
-        allowNull: false
     }
 }, {
     timestamps: false,
